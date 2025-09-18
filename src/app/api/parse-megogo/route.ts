@@ -146,6 +146,7 @@ export async function POST(req: NextRequest) {
       pageTitle,
       data: results,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

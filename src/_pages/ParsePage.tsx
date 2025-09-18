@@ -10,7 +10,8 @@ interface IParsePage {
 
 export const ParsePage: FC<IParsePage> = ({ className }) => {
   const [inputUrl, setInputUrl] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -32,7 +33,7 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
 
       setResult(data);
     } catch (err) {
-      setResult({ error: 'Failed to fetch' });
+      setResult({ error: 'Failed to fetch', err });
     } finally {
       setLoading(false);
     }

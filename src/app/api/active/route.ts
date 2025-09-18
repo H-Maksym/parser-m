@@ -1,13 +1,12 @@
-// app/api/parse-megogo/route.ts
 import * as cheerio from 'cheerio';
 import type { AnyNode } from 'domhandler';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-type Episode = {
-  title: string;
-  url: string;
-};
+// type Episode = {
+//   title: string;
+//   url: string;
+// };
 
 type Season = {
   title: string;
@@ -16,15 +15,22 @@ type Season = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { url, seasonUrl="https://megogo.net/ua/view/68751" } = await req.json();
+    const { url, seasonUrl = 'https://megogo.net/ua/view/68751' } =
+      await req.json();
 
     if (!url || typeof url !== 'string') {
-      return NextResponse.json({ error: 'Missing or invalid "url"' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing or invalid "url"' },
+        { status: 400 },
+      );
     }
 
     const res = await fetch(url);
     if (!res.ok) {
-      return NextResponse.json({ error: 'Failed to fetch main page' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to fetch main page' },
+        { status: 500 },
+      );
     }
 
     const html = await res.text();
@@ -52,7 +58,10 @@ export async function POST(req: NextRequest) {
     // --- STEP 2: Parse episodes from given seasonUrl ---
     const seasonRes = await fetch(seasonUrl);
     if (!seasonRes.ok) {
-      return NextResponse.json({ error: 'Failed to fetch season page' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to fetch season page' },
+        { status: 500 },
+      );
     }
 
     const seasonHtml = await seasonRes.text();
@@ -60,11 +69,16 @@ export async function POST(req: NextRequest) {
 
     const episodesContainer = $$('div.episodes-container');
     if (!episodesContainer.length) {
-      return NextResponse.json({ error: 'No episodes container found on season page' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'No episodes container found on season page' },
+        { status: 404 },
+      );
     }
 
     // Можуть бути різні div.season-container (один з них буде "is-loaded")
-    let seasonContainer = episodesContainer.find('div.season-container.is-loaded');
+    let seasonContainer = episodesContainer.find(
+      'div.season-container.is-loaded',
+    );
 
     // Якщо is-loaded немає, fallback на перший season-container
     if (!seasonContainer.length) {
@@ -72,7 +86,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!seasonContainer.length) {
-      return NextResponse.json({ error: 'No valid season container found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'No valid season container found' },
+        { status: 404 },
+      );
     }
 
     const parsed = parseEpisodes(seasonContainer, seasonUrl);
@@ -82,14 +99,11 @@ export async function POST(req: NextRequest) {
       episodesCount: parsed.episodesCount,
       episodes: parsed.episodes,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
-
-
-
 
 function parseEpisodes(container: cheerio.Cheerio<AnyNode>, baseUrl: string) {
   const episodes: Array<{ title: string; url: string }> = [];
@@ -115,5 +129,3 @@ function parseEpisodes(container: cheerio.Cheerio<AnyNode>, baseUrl: string) {
     episodes,
   };
 }
-
-

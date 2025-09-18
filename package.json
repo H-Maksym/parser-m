@@ -7,13 +7,15 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "parse:megogo": "tsx scripts/parse-megogo.ts"
+    "parse:megogo": "tsx scripts/parse-megogo.ts",
+    "postinstall": "npx @sparticuz/chromium install"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^138.0.2",
     "cheerio": "^1.1.2",
     "domhandler": "^5.0.3",
     "next": "15.5.3",
-    "puppeteer": "^24.22.0",
+    "puppeteer-core": "^24.22.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
@@ -27,6 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
     "prettier": "^3.6.2",
+    "puppeteer": "^24.22.0",
     "tailwindcss": "^4",
     "tsx": "^4.20.5",
     "typescript": "^5"

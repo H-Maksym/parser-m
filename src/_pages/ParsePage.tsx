@@ -3,7 +3,6 @@
 import { Loader } from '@/_components/Loader';
 import { FC, useState } from 'react';
 
-// 1. Інтерфейс пропсів
 interface IParsePage {
   className?: string;
 }
@@ -11,10 +10,10 @@ interface IParsePage {
 export const ParsePage: FC<IParsePage> = ({ className }) => {
   const [inputUrl, setInputUrl] = useState('');
   const [result, setResult] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
-
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // 🔍 Парсинг і вивід JSON у інтерфейс
   const handleParse = async () => {
     if (!inputUrl) return;
 
@@ -29,8 +28,13 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
         body: JSON.stringify({ url: inputUrl }),
       });
 
-      const data = await res.json();
+      if (!res.ok) {
+        const errorData = await res.json();
+        setResult({ error: errorData.error || 'Сервер повернув помилку' });
+        return;
+      }
 
+      const data = await res.json();
       setResult(data);
     } catch (err) {
       setResult({ error: 'Failed to fetch', err });
@@ -39,6 +43,45 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
     }
   };
 
+  // 💾 Скачування CSV
+  const handleDownloadCSV = async () => {
+    if (!inputUrl) return;
+
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/parse-megogo?format=csv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: inputUrl }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        setResult({ error: errorData.error || 'Помилка при завантаженні CSV' });
+        return;
+      }
+
+      const csvText = await res.text();
+      const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'episodes.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      // setResult({ success: 'CSV файл успішно завантажено' });
+    } catch (err) {
+      setResult({ error: 'Помилка при скачуванні CSV', err });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 📋 Копіювання JSON у буфер
   const handleCopy = () => {
     if (!result) return;
 
@@ -49,18 +92,10 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
     });
   };
 
-  const handleDownloadCSV = () => {
-    const link = document.createElement('a');
-    link.href = '/episodes.csv'; // шлях до файлу у public
-    link.download = 'episodes.csv';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <div className={className}>
       <h1 className="text-2xl font-bold mb-4">MEGOGO Parser</h1>
+
       <input
         type="text"
         className="border p-2 w-full max-w-xl mb-4"
@@ -68,6 +103,7 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
         value={inputUrl}
         onChange={e => setInputUrl(e.target.value)}
       />
+
       <button
         onClick={handleParse}
         disabled={loading}
@@ -75,7 +111,9 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
       >
         {loading ? 'Завантаження...' : 'Парсити'}
       </button>
+
       {loading && <Loader />}
+
       {result && (
         <>
           <div className="flex items-center mt-6 space-x-4">
@@ -85,14 +123,17 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
             >
               {copied ? 'Скопійовано!' : 'Скопіювати'}
             </button>
+
             <button
               onClick={handleDownloadCSV}
-              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
+              disabled={loading}
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition disabled:opacity-50"
             >
               Завантажити CSV
             </button>
           </div>
-          <pre className="mt-2 bg-gray-100 p-4 rounded overflow-x-auto">
+
+          <pre className="mt-4 bg-gray-100 p-4 rounded overflow-x-auto text-sm">
             {JSON.stringify(result, null, 2)}
           </pre>
         </>

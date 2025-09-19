@@ -47,6 +47,12 @@ async function parseMegogo(url: string) {
   const browser = await launchBrowser();
   const page = await browser.newPage();
 
+  await page.setUserAgent({
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+    // userAgentMetadata: { ... } // це можна пропустити, якщо не хочеш додавати метадані
+  });
+
   await page.goto(url, { waitUntil: 'networkidle2' });
 
   const pageTitle = await page.evaluate(() => {

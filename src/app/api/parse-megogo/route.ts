@@ -18,7 +18,7 @@ const launchBrowser = async () => {
         '--disable-renderer-backgrounding',
       ],
       executablePath: await chromium.executablePath(chromiumPack),
-      headless: true,
+      headless: 'shell',
 
       defaultViewport: { width: 1280, height: 720 },
     });
@@ -58,7 +58,6 @@ async function parseMegogo(url: string) {
   await page.setRequestInterception(true);
   page.on('request', req => {
     const url = req.url();
-
     const blockedResources = [
       'google-analytics.com',
       'bluekai.com',
@@ -71,9 +70,8 @@ async function parseMegogo(url: string) {
       'googletagmanager.com',
       'gstatic.com/prebid',
     ];
-
     if (blockedResources.some(domain => url.includes(domain))) {
-      console.log('⛔ Blocked:', url);
+      // console.log('⛔ Blocked:', url);
       req.abort();
     } else {
       req.continue();
@@ -118,15 +116,7 @@ async function parseMegogo(url: string) {
     );
     return main ? main.innerHTML : null;
   });
-  console.log('🧾 mainSectionHtml:', mainSectionHtml);
-
-  const videoEpisodes = await page.evaluate(() => {
-    const main = document.querySelector(
-      'main section.widget.videoView_v2.product-main div.videoView-episodes',
-    );
-    return main ? main.innerHTML : null;
-  });
-  console.log('🧾 videoEpisodes:', videoEpisodes);
+  console.log('🧾 Main element content:', mainSectionHtml);
 
   const hasVideoPlayer = await page.evaluate(() => {
     page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));

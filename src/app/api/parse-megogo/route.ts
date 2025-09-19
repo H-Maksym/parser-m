@@ -83,7 +83,7 @@ async function parseMegogo(url: string) {
 
   // Якщо хочеш подивитись конкретний елемент
   const mainElementHtml = await page.evaluate(() => {
-    const main = document.querySelector('main');
+    const main = document.querySelector('main div.videoView-episodes');
     // або потрібний селектор
     return main ? main.innerHTML : null;
   });

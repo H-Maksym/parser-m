@@ -112,7 +112,7 @@ CMD ["pnpm", "start"]
 
 
 
-
+#Команди для перевірки локально - має бути запущений Docker Desktop на комп'ютері
 # docker build -t parser-m .
 # docker run -p 3000:3000 parser-m
 

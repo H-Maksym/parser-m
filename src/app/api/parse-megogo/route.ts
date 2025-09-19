@@ -30,7 +30,7 @@ const launchBrowser = async () => {
         '--disable-renderer-backgrounding',
       ],
       executablePath: await chromium.executablePath(urlChromium),
-      headless: true,
+      headless: 'shell',
 
       defaultViewport: { width: 1280, height: 720 },
     });
@@ -105,8 +105,7 @@ async function parseMegogo(url: string) {
   // Завантажуємо сторінку
   // завантаження з повним очікуванням
   const response = await page.goto(url, {
-    waitUntil: 'networkidle2',
-    timeout: 20000,
+    waitUntil: 'domcontentloaded',
   });
 
   if (!response || !response.ok()) {

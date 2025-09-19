@@ -54,11 +54,38 @@ async function parseMegogo(url: string) {
   const browser = await launchBrowser();
   const page = await browser.newPage();
 
+  // Блокуємо аналітику, рекламу, трекери
+  await page.setRequestInterception(true);
+  page.on('request', req => {
+    const blockedResources = [
+      'google-analytics.com',
+      'bluekai.com',
+      'mgid.com',
+      'admixer.net',
+      'megogo.net/v5/tracker',
+    ];
+    const url = req.url();
+    if (blockedResources.some(domain => url.includes(domain))) {
+      // console.log('⛔ Blocked:', url);
+      req.abort();
+    } else {
+      req.continue();
+    }
+  });
+
+  // Встановлюємо User-Agent
   await page.setUserAgent({
     userAgent:
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
   });
 
+  // Логування помилок
+  page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
+  // page.on('requestfailed', req =>
+  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
+  // );
+
+  // Завантажуємо сторінку
   const response = await page.goto(url, {
     waitUntil: 'domcontentloaded',
     timeout: 10000,
@@ -70,50 +97,32 @@ async function parseMegogo(url: string) {
       response ? response.status() : 'No response',
     );
   }
-  console.log('Page loaded with status:', response?.status());
+  console.log('✅ Page loaded with status:', response?.status());
 
   const pageTitle = await page.evaluate(() => {
     const h1 = document.querySelector('h1.video-title[itemprop="name"]');
     return h1 ? h1.textContent?.trim() : '';
   });
-  console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
+  console.log('🎬 Title:', pageTitle);
 
-  //Логування помилок
-  page.on('pageerror', err => console.error('PAGE ERROR:', err));
-  page.on('requestfailed', req =>
-    console.error('Request failed:', req.url(), req.failure()),
-  );
-
-  // Подивитись основний HTML сторінки (body)
-  // const mainContent = await page.content();
-
-  // const filePath = '/tmp/main-element.html';
-  // fs.writeFileSync(filePath, mainContent || '');
-  // console.log('Saved to:', filePath);
-
-  // fs.writeFileSync(
-  //   path.join(process.cwd(), 'main-element.html'),
-  //   mainContent || '',
-  // );
-  // console.log('HTML saved to main-element.html');
-
-  // Якщо хочеш подивитись конкретний елемент
-  const mainElementHtml = await page.evaluate(() => {
+  const mainSectionHtml = await page.evaluate(() => {
     const main = document.querySelector(
       'main section.widget.videoView_v2.product-main',
     );
-    // або потрібний селектор
     return main ? main.innerHTML : null;
   });
-  console.log('🚀 ~ parseMegogo ~ mainElementHtml:', mainElementHtml);
+  console.log('🧾 Main element content:', mainSectionHtml);
+
+  const hasVideoPlayer = await page.evaluate(() => {
+    page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
+    return (
+      !!document.querySelector('#videoViewPlayer') ||
+      !!document.querySelector('video')
+    );
+  });
+  console.log('🎥 Player present?', hasVideoPlayer);
 
   await page.waitForSelector('ul.seasons-list');
-  // await page.waitForFunction(
-  //   () => !!document.querySelector('ul.seasons-list'),
-  //   {
-  //     timeout: 60000,
-  //   },
-  // );
 
   const seasons = await page.$$eval('ul.seasons-list li a', links =>
     links.map(a => ({

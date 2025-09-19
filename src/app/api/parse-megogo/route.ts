@@ -1,4 +1,4 @@
-import chromium from '@sparticuz/chromium-min';
+import chromium from '@sparticuz/chromium';
 import fs from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';

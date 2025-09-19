@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@sparticuz/chromium':
+        specifier: 121.0.0
+        version: 121.0.0
       '@sparticuz/chromium-min':
         specifier: 121.0.0
         version: 121.0.0
@@ -541,6 +544,10 @@ packages:
 
   '@sparticuz/chromium-min@121.0.0':
     resolution: {integrity: sha512-gdgL9W3WsPcuIJL/Xmz3jhbh8HbNHXQ3WgTyZ8bQ+76y3/nF58S2WACgGQADr2B98xPndSEDs0MWqr3kBb2qcQ==}
+    engines: {node: '>= 16'}
+
+  '@sparticuz/chromium@121.0.0':
+    resolution: {integrity: sha512-0DiRzlCJljjMKOUh0W36zeR1ibG7EZkwIG+ve8Lg0+tbCM6TWaFlHMSt/6K6Y7o7PFy3eaPoLrUvGRRYUvd81g==}
     engines: {node: '>= 16'}
 
   '@swc/helpers@0.5.15':
@@ -2751,6 +2758,15 @@ snapshots:
   '@rushstack/eslint-patch@1.12.0': {}
 
   '@sparticuz/chromium-min@121.0.0':
+    dependencies:
+      follow-redirects: 1.15.11
+      tar-fs: 3.1.1
+    transitivePeerDependencies:
+      - bare-buffer
+      - debug
+      - react-native-b4a
+
+  '@sparticuz/chromium@121.0.0':
     dependencies:
       follow-redirects: 1.15.11
       tar-fs: 3.1.1

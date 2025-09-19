@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "parse:megogo": "tsx scripts/parse-megogo.ts",
-    "postinstall": "npx @sparticuz/chromium install"
+    "postinstall": "node ./scripts/install-chromium.js"
   },
   "dependencies": {
     "@sparticuz/chromium": "^138.0.2",

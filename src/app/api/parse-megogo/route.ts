@@ -9,9 +9,10 @@ const launchBrowser = async () => {
   const isVercel = !!process.env.AWS_REGION || !!process.env.VERCEL;
   if (isVercel) {
     return await puppeteer.launch({
-      args: chromium.args,
+      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
       executablePath: await chromium.executablePath(chromiumPack),
       headless: true,
+
       defaultViewport: { width: 1280, height: 720 },
     });
   } else {

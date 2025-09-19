@@ -91,9 +91,10 @@ async function parseMegogo(url: string) {
   // );
 
   // Завантажуємо сторінку
+  // завантаження з повним очікуванням
   const response = await page.goto(url, {
-    waitUntil: 'domcontentloaded',
-    timeout: 10000,
+    waitUntil: 'networkidle0',
+    timeout: 20000,
   });
 
   if (!response || !response.ok()) {
@@ -110,23 +111,35 @@ async function parseMegogo(url: string) {
   });
   console.log('🎬 Title:', pageTitle);
 
+  // почекати вручну, якщо треба
+  await new Promise(resolve => setTimeout(resolve, 5000));
+
+  // чекати, поки серії завантажаться
+  await page.waitForFunction(
+    () => {
+      const list = document.querySelector('ul.seasons-list');
+      return list && list.children.length > 0;
+    },
+    { timeout: 20000 },
+  );
+
   const mainSectionHtml = await page.evaluate(() => {
     const main = document.querySelector(
-      'main section.widget.videoView_v2.product-main',
+      'main section.widget.videoView_v2.product-main div.videoView-episodes',
     );
     return main ? main.innerHTML : null;
   });
   console.log('🧾 Main element content:', mainSectionHtml);
 
-  const hasVideoPlayer = await page.evaluate(() => {
-    return (
-      !!document.querySelector('#videoViewPlayer') ||
-      !!document.querySelector('video')
-    );
-  });
-  console.log('🎥 Player present?', hasVideoPlayer);
+  // const hasVideoPlayer = await page.evaluate(() => {
+  //   return (
+  //     !!document.querySelector('#videoViewPlayer') ||
+  //     !!document.querySelector('video')
+  //   );
+  // });
+  // console.log('🎥 Player present?', hasVideoPlayer);
 
-  await page.waitForSelector('ul.seasons-list');
+  // await page.waitForSelector('ul.seasons-list');
 
   const seasons = await page.$$eval('ul.seasons-list li a', links =>
     links.map(a => ({

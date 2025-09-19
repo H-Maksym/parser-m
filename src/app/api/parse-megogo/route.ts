@@ -123,13 +123,7 @@ async function parseMegogo(url: string) {
   });
   console.log('🎬 btnAge:', btnAge);
 
-  // Клікаємо по кнопці
-  await page.click(
-    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  );
-
   await new Promise(resolve => setTimeout(resolve, 5000));
-
   // 🖼️ Зберігаємо скріншот у /tmp
 
   const screenshotFileName = `screenshotFileName.png`;
@@ -138,6 +132,11 @@ async function parseMegogo(url: string) {
     : `public/${screenshotFileName}`;
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
+
+  //  Клікаємо по кнопці
+  await page.click(
+    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  );
 
   if (!response || !response.ok()) {
     console.error(

@@ -1,5 +1,6 @@
 import chromium from '@sparticuz/chromium-min';
 import { NextRequest, NextResponse } from 'next/server';
+import path from 'path';
 import puppeteer from 'puppeteer-core';
 
 const launchBrowser = async () => {
@@ -7,7 +8,15 @@ const launchBrowser = async () => {
   if (isVercel) {
     return await puppeteer.launch({
       args: chromium.args,
-      executablePath: await chromium.executablePath(),
+      executablePath: await chromium.executablePath(
+        path.join(
+          process.cwd(),
+          'node_modules',
+          '@sparticuz',
+          'chromium-min',
+          'bin',
+        ),
+      ),
       headless: true,
       defaultViewport: { width: 1280, height: 720 },
     });

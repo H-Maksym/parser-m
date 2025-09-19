@@ -1,5 +1,7 @@
 import chromium from '@sparticuz/chromium-min';
+import fs from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
+import path from 'path';
 import puppeteer from 'puppeteer-core';
 
 const launchBrowser = async () => {
@@ -52,7 +54,36 @@ async function parseMegogo(url: string) {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
   });
 
-  await page.goto(url, { waitUntil: 'networkidle2' });
+  const response = await page.goto(url, { waitUntil: 'networkidle2' });
+
+  if (!response || !response.ok()) {
+    console.error(
+      'Failed to load the page:',
+      response ? response.status() : 'No response',
+    );
+    return;
+  }
+  console.log('Page loaded with status:', response.status());
+
+  // Подивитись основний HTML сторінки (body)
+  const mainContent = await page.content();
+
+  const filePath = '/tmp/main-element.html';
+  fs.writeFileSync(filePath, mainContent || '');
+  console.log('Saved to:', filePath);
+
+  // fs.writeFileSync(
+  //   path.join(process.cwd(), 'main-element.html'),
+  //   mainContent || '',
+  // );
+  // console.log('HTML saved to main-element.html');
+
+  // Якщо хочеш подивитись конкретний елемент
+  // const mainElementHtml = await page.evaluate(() => {
+  //   const main = document.querySelector('main');
+  //   // або потрібний селектор
+  //   return main ? main.innerHTML : null;
+  // });
 
   const pageTitle = await page.evaluate(() => {
     const h1 = document.querySelector('h1.video-title[itemprop="name"]');
@@ -67,11 +98,11 @@ async function parseMegogo(url: string) {
     },
   );
 
-  const ulSeasonsList = await page.evaluate(() => {
-    const el = document.querySelector('ul.seasons-list');
-    return el ? el.innerHTML : null;
-  });
-  console.log('Page ulSeasonsList snapshot:', ulSeasonsList);
+  // const ulSeasonsList = await page.evaluate(() => {
+  //   const el = document.querySelector('ul.seasons-list');
+  //   return el ? el.innerHTML : null;
+  // });
+  // console.log('Page ulSeasonsList snapshot:', ulSeasonsList);
 
   // await page.waitForSelector('ul.seasons-list');
 
@@ -84,7 +115,6 @@ async function parseMegogo(url: string) {
         : '',
     })),
   );
-  console.log('🚀 ~ parseMegogo ~ seasons:', seasons);
 
   const results: Record<string, Array<{ title: string; url: string }>> = {};
 

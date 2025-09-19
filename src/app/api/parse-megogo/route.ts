@@ -110,20 +110,19 @@ async function parseMegogo(url: string) {
     waitUntil: 'domcontentloaded',
   });
 
-  // Чекаємо поки кнопка з'явиться в DOM
-  await page.waitForSelector(
-    '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-    { timeout: 5000 },
-  );
-
   // 🖼️ Зберігаємо скріншот у /tmp
-
   const screenshotFileName = `screenshotFileName.png`;
   const screenshotPath = isRemote
     ? `/tmp/${screenshotFileName}`
     : `public/${screenshotFileName}`;
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
+
+  // Чекаємо поки кнопка з'явиться в DOM
+  await page.waitForSelector(
+    '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+    { timeout: 5000 },
+  );
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(

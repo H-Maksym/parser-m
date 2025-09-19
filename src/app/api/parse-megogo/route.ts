@@ -50,10 +50,9 @@ async function parseMegogo(url: string) {
   await page.setUserAgent({
     userAgent:
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-    // userAgentMetadata: { ... } // це можна пропустити, якщо не хочеш додавати метадані
   });
 
-  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await page.goto(url, { waitUntil: 'networkidle2' });
 
   const pageTitle = await page.evaluate(() => {
     const h1 = document.querySelector('h1.video-title[itemprop="name"]');
@@ -61,13 +60,14 @@ async function parseMegogo(url: string) {
   });
   console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
 
+  await new Promise(r => setTimeout(r, 4000));
   const ulSeasonsList = await page.evaluate(() => {
     const el = document.querySelector('ul.seasons-list');
     return el ? el.innerHTML : null;
   });
   console.log('Page ulSeasonsList snapshot:', ulSeasonsList);
 
-  await page.waitForSelector('ul.seasons-list');
+  await page.waitForSelector('ul.seasons-list', { timeout: 10000 });
 
   const seasons = await page.$$eval('ul.seasons-list li a', links =>
     links.map(a => ({

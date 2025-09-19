@@ -1,9 +1,7 @@
 import chromium from '@sparticuz/chromium-min';
 import fs from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
-import path from 'path';
 import puppeteer from 'puppeteer-core';
-
 const launchBrowser = async () => {
   const chromiumPack =
     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
@@ -61,9 +59,14 @@ async function parseMegogo(url: string) {
       'Failed to load the page:',
       response ? response.status() : 'No response',
     );
-    return;
   }
-  console.log('Page loaded with status:', response.status());
+  console.log('Page loaded with status:', response?.status());
+
+  const pageTitle = await page.evaluate(() => {
+    const h1 = document.querySelector('h1.video-title[itemprop="name"]');
+    return h1 ? h1.textContent?.trim() : '';
+  });
+  console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
 
   // Подивитись основний HTML сторінки (body)
   const mainContent = await page.content();
@@ -85,26 +88,13 @@ async function parseMegogo(url: string) {
   //   return main ? main.innerHTML : null;
   // });
 
-  const pageTitle = await page.evaluate(() => {
-    const h1 = document.querySelector('h1.video-title[itemprop="name"]');
-    return h1 ? h1.textContent?.trim() : '';
-  });
-  console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
-
-  await page.waitForFunction(
-    () => !!document.querySelector('ul.seasons-list'),
-    {
-      timeout: 60000,
-    },
-  );
-
-  // const ulSeasonsList = await page.evaluate(() => {
-  //   const el = document.querySelector('ul.seasons-list');
-  //   return el ? el.innerHTML : null;
-  // });
-  // console.log('Page ulSeasonsList snapshot:', ulSeasonsList);
-
-  // await page.waitForSelector('ul.seasons-list');
+  await page.waitForSelector('ul.seasons-list');
+  // await page.waitForFunction(
+  //   () => !!document.querySelector('ul.seasons-list'),
+  //   {
+  //     timeout: 60000,
+  //   },
+  // );
 
   const seasons = await page.$$eval('ul.seasons-list li a', links =>
     links.map(a => ({
@@ -119,7 +109,6 @@ async function parseMegogo(url: string) {
   const results: Record<string, Array<{ title: string; url: string }>> = {};
 
   for (const season of seasons) {
-    console.log('🚀 ~ parseMegogo ~ season:', season);
     await page.goto(season.href, { waitUntil: 'domcontentloaded' });
 
     await page.waitForSelector(

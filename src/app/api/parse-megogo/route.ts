@@ -115,6 +115,16 @@ async function parseMegogo(url: string) {
     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
     { timeout: 5000 },
   );
+
+  // 🖼️ Зберігаємо скріншот у /tmp
+
+  const screenshotFileName = `screenshotFileName.png`;
+  const screenshotPath = isRemote
+    ? `/tmp/${screenshotFileName}`
+    : `public/${screenshotFileName}`;
+
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(
       '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
@@ -124,14 +134,6 @@ async function parseMegogo(url: string) {
   console.log('🎬 btnAge:', btnAge);
 
   await new Promise(resolve => setTimeout(resolve, 5000));
-  // 🖼️ Зберігаємо скріншот у /tmp
-
-  const screenshotFileName = `screenshotFileName.png`;
-  const screenshotPath = isRemote
-    ? `/tmp/${screenshotFileName}`
-    : `public/${screenshotFileName}`;
-
-  await page.screenshot({ path: screenshotPath, fullPage: true });
 
   //  Клікаємо по кнопці
   await page.click(

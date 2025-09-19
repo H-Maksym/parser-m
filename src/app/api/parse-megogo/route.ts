@@ -114,15 +114,6 @@ async function parseMegogo(url: string) {
   // почекати вручну, якщо треба
   await new Promise(resolve => setTimeout(resolve, 5000));
 
-  // чекати, поки серії завантажаться
-  await page.waitForFunction(
-    () => {
-      const list = document.querySelector('ul.seasons-list');
-      return list && list.children.length > 0;
-    },
-    { timeout: 20000 },
-  );
-
   const mainSectionHtml = await page.evaluate(() => {
     const main = document.querySelector(
       'main section.widget.videoView_v2.product-main div.videoView-episodes',
@@ -131,15 +122,16 @@ async function parseMegogo(url: string) {
   });
   console.log('🧾 Main element content:', mainSectionHtml);
 
-  // const hasVideoPlayer = await page.evaluate(() => {
-  //   return (
-  //     !!document.querySelector('#videoViewPlayer') ||
-  //     !!document.querySelector('video')
-  //   );
-  // });
-  // console.log('🎥 Player present?', hasVideoPlayer);
+  // чекати, поки серії завантажаться
+  // await page.waitForFunction(
+  //   () => {
+  //     const list = document.querySelector('ul.seasons-list');
+  //     return list && list.children.length > 0;
+  //   },
+  //   { timeout: 20000 },
+  // );
 
-  // await page.waitForSelector('ul.seasons-list');
+  await page.waitForSelector('ul.seasons-list');
 
   const seasons = await page.$$eval('ul.seasons-list li a', links =>
     links.map(a => ({

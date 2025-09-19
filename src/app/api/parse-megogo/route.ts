@@ -119,7 +119,6 @@ async function parseMegogo(url: string) {
   console.log('🧾 Main element content:', mainSectionHtml);
 
   const hasVideoPlayer = await page.evaluate(() => {
-    page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
     return (
       !!document.querySelector('#videoViewPlayer') ||
       !!document.querySelector('video')

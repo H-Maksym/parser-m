@@ -1,22 +1,15 @@
 import chromium from '@sparticuz/chromium-min';
 import { NextRequest, NextResponse } from 'next/server';
-import path from 'path';
 import puppeteer from 'puppeteer-core';
 
 const launchBrowser = async () => {
+  const chromiumPack = 'https://my-domain/chromium-v121.0.0-pack.tar';
+
   const isVercel = !!process.env.AWS_REGION || !!process.env.VERCEL;
   if (isVercel) {
     return await puppeteer.launch({
       args: chromium.args,
-      executablePath: await chromium.executablePath(
-        path.join(
-          process.cwd(),
-          'node_modules',
-          '@sparticuz',
-          'chromium-min',
-          'bin',
-        ),
-      ),
+      executablePath: await chromium.executablePath(chromiumPack),
       headless: true,
       defaultViewport: { width: 1280, height: 720 },
     });

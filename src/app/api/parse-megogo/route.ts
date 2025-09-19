@@ -53,6 +53,7 @@ async function parseMegogo(url: string) {
     const h1 = document.querySelector('h1.video-title[itemprop="name"]');
     return h1 ? h1.textContent?.trim() : '';
   });
+  console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
 
   await page.waitForSelector('ul.seasons-list');
 
@@ -65,10 +66,12 @@ async function parseMegogo(url: string) {
         : '',
     })),
   );
+  console.log('🚀 ~ parseMegogo ~ seasons:', seasons);
 
   const results: Record<string, Array<{ title: string; url: string }>> = {};
 
   for (const season of seasons) {
+    console.log('🚀 ~ parseMegogo ~ season:', season);
     await page.goto(season.href, { waitUntil: 'domcontentloaded' });
 
     await page.waitForSelector(

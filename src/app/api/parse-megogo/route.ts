@@ -8,7 +8,15 @@ const launchBrowser = async () => {
   const isVercel = !!process.env.AWS_REGION || !!process.env.VERCEL;
   if (isVercel) {
     return await puppeteer.launch({
-      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--autoplay-policy=no-user-gesture-required',
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--disable-background-timer-throttling',
+        '--disable-renderer-backgrounding',
+      ],
       executablePath: await chromium.executablePath(chromiumPack),
       headless: true,
 
@@ -69,6 +77,12 @@ async function parseMegogo(url: string) {
     return h1 ? h1.textContent?.trim() : '';
   });
   console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
+
+  //Логування помилок
+  page.on('pageerror', err => console.error('PAGE ERROR:', err));
+  page.on('requestfailed', req =>
+    console.error('Request failed:', req.url(), req.failure()),
+  );
 
   // Подивитись основний HTML сторінки (body)
   // const mainContent = await page.content();

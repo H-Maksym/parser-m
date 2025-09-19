@@ -5,8 +5,20 @@ const launchBrowser = async () => {
   const chromiumPack =
     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
-  const isVercel = !!process.env.AWS_REGION || !!process.env.VERCEL;
-  if (isVercel) {
+  const isRemote =
+    !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
+  const isDocker = !!process.env.IS_DOCKER; // додай цю змінну в свій Docker контейнер через ENV
+
+  // Визначення URL
+  const urlChromium = isRemote
+    ? chromiumPack
+    : isDocker
+      ? '/usr/local/bin/chromium' // шлях до кастомного Chromium у контейнері
+      : 'http://localhost:3000'; // локально, якщо ні Vercel, ні Docker
+
+  // launchBrowser залишається як раніше, тільки з цією змінною url можна далі працювати
+
+  if (isRemote) {
     return await puppeteer.launch({
       args: [
         ...chromium.args,
@@ -17,8 +29,8 @@ const launchBrowser = async () => {
         '--disable-background-timer-throttling',
         '--disable-renderer-backgrounding',
       ],
-      executablePath: await chromium.executablePath(chromiumPack),
-      headless: 'shell',
+      executablePath: await chromium.executablePath(urlChromium),
+      headless: true,
 
       defaultViewport: { width: 1280, height: 720 },
     });
@@ -93,7 +105,7 @@ async function parseMegogo(url: string) {
   // Завантажуємо сторінку
   // завантаження з повним очікуванням
   const response = await page.goto(url, {
-    waitUntil: 'networkidle0',
+    waitUntil: 'networkidle2',
     timeout: 20000,
   });
 

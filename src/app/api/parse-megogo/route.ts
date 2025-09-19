@@ -1,12 +1,15 @@
 import chromium from '@sparticuz/chromium';
+
 import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';
+
+const isRemote =
+  !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
+
 const launchBrowser = async () => {
   const chromiumPack =
     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
-  const isRemote =
-    !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
   const isDocker = !!process.env.IS_DOCKER; // додай цю змінну в свій Docker контейнер через ENV
 
   // Визначення URL
@@ -30,7 +33,6 @@ const launchBrowser = async () => {
         '--disable-renderer-backgrounding',
       ],
       executablePath: await chromium.executablePath(urlChromium),
-      headless: 'shell',
 
       defaultViewport: { width: 1280, height: 720 },
     });
@@ -108,6 +110,35 @@ async function parseMegogo(url: string) {
     waitUntil: 'domcontentloaded',
   });
 
+  // Чекаємо поки кнопка з'явиться в DOM
+  await page.waitForSelector(
+    '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+    { timeout: 5000 },
+  );
+  const btnAge = await page.evaluate(() => {
+    const btn = document.querySelector(
+      '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+    );
+    return btn ? btn.innerHTML : null;
+  });
+  console.log('🎬 btnAge:', btnAge);
+
+  // Клікаємо по кнопці
+  await page.click(
+    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  );
+
+  await new Promise(resolve => setTimeout(resolve, 5000));
+
+  // 🖼️ Зберігаємо скріншот у /tmp
+
+  const screenshotFileName = `screenshotFileName.png`;
+  const screenshotPath = isRemote
+    ? `/tmp/${screenshotFileName}`
+    : `public/${screenshotFileName}`;
+
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+
   if (!response || !response.ok()) {
     console.error(
       'Failed to load the page:',
@@ -125,13 +156,13 @@ async function parseMegogo(url: string) {
   // почекати вручну, якщо треба
   await new Promise(resolve => setTimeout(resolve, 5000));
 
-  const mainSectionHtml = await page.evaluate(() => {
-    const main = document.querySelector(
-      'main section.widget.videoView_v2.product-main div.videoView-episodes',
-    );
-    return main ? main.innerHTML : null;
-  });
-  console.log('🧾 Main element content:', mainSectionHtml);
+  // const mainSectionHtml = await page.evaluate(() => {
+  //   const main = document.querySelector(
+  //     'main section.widget.videoView_v2.product-main div.videoView-episodes',
+  //   );
+  //   return main ? main.innerHTML : null;
+  // });
+  // console.log('🧾 Main element content:', mainSectionHtml);
 
   // чекати, поки серії завантажаться
   // await page.waitForFunction(
@@ -211,6 +242,12 @@ async function parseMegogo(url: string) {
 
   await browser.close();
 
+  // // 📥 Зчитуємо скріншот у base64
+  // const screenshotBase64 = await readFile(screenshotPath, {
+  //   encoding: 'base64',
+  // });
+
+  // return { screenshotPath, screenshotBase64, pageTitle, results };
   return { pageTitle, results };
 }
 
@@ -248,12 +285,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Якщо format не csv, повертаємо JSON
+    // Якщо format не csv, повертаємо JSON + скріншот
     return NextResponse.json({
+      // screenshotPath,
+      // screenshot: `data:image/png;base64,${screenshotBase64}`,
       pageTitle,
       totalSeasons: Object.keys(results).length,
       data: results,
     });
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json(

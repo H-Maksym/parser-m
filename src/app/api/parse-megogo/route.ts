@@ -69,11 +69,11 @@ async function parseMegogo(url: string) {
   console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
 
   // Подивитись основний HTML сторінки (body)
-  const mainContent = await page.content();
+  // const mainContent = await page.content();
 
-  const filePath = '/tmp/main-element.html';
-  fs.writeFileSync(filePath, mainContent || '');
-  console.log('Saved to:', filePath);
+  // const filePath = '/tmp/main-element.html';
+  // fs.writeFileSync(filePath, mainContent || '');
+  // console.log('Saved to:', filePath);
 
   // fs.writeFileSync(
   //   path.join(process.cwd(), 'main-element.html'),
@@ -82,11 +82,12 @@ async function parseMegogo(url: string) {
   // console.log('HTML saved to main-element.html');
 
   // Якщо хочеш подивитись конкретний елемент
-  // const mainElementHtml = await page.evaluate(() => {
-  //   const main = document.querySelector('main');
-  //   // або потрібний селектор
-  //   return main ? main.innerHTML : null;
-  // });
+  const mainElementHtml = await page.evaluate(() => {
+    const main = document.querySelector('main');
+    // або потрібний селектор
+    return main ? main.innerHTML : null;
+  });
+  console.log('🚀 ~ parseMegogo ~ mainElementHtml:', mainElementHtml);
 
   await page.waitForSelector('ul.seasons-list');
   // await page.waitForFunction(

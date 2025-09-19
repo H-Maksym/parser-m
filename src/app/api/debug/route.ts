@@ -1,18 +1,22 @@
 import fs from 'fs';
-import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 
-export default function handler(_: NextApiRequest, res: NextApiResponse) {
+export async function GET() {
   const fileName = 'screenshotFileName.png';
   const filePath = path.join('/tmp', fileName);
 
-  // 🔽 Цей лог потрапить у Render → Logs
+  // 🔽 Лог потрапить у Render → Logs
   console.log('[DEBUG] Checking files in /tmp:', fs.readdirSync('/tmp'));
 
   if (!fs.existsSync(filePath)) {
     console.log(`[ERROR] File ${fileName} not found in /tmp`);
-    res.status(404).json({ error: `File ${fileName} not found in /tmp` });
-    return;
+    return new Response(
+      JSON.stringify({ error: `File ${fileName} not found in /tmp` }),
+      {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
   }
 
   try {
@@ -22,12 +26,21 @@ export default function handler(_: NextApiRequest, res: NextApiResponse) {
       `[SUCCESS] Serving file ${fileName} (${fileBuffer.length} bytes)`,
     );
 
-    res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
-    res.status(200).send(fileBuffer);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return new Response(fileBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/png',
+        'Content-Disposition': `inline; filename="${fileName}"`,
+      },
+    });
   } catch (err: any) {
     console.error('[ERROR] Failed to read file:', err);
-    res.status(500).json({ error: 'Error reading file', message: err.message });
+    return new Response(
+      JSON.stringify({ error: 'Error reading file', message: err.message }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
   }
 }

@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';
 
 const launchBrowser = async () => {
-  const chromiumPack =
-    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
+  // const chromiumPack =
+  //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
   const isVercel = !!process.env.AWS_REGION || !!process.env.VERCEL;
   if (isVercel) {
     return await puppeteer.launch({
       args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: await chromium.executablePath(chromiumPack),
+      executablePath: await chromium.executablePath(),
       headless: true,
 
       defaultViewport: { width: 1280, height: 720 },
@@ -60,7 +60,6 @@ async function parseMegogo(url: string) {
   });
   console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
 
-  await new Promise(r => setTimeout(r, 4000));
   const ulSeasonsList = await page.evaluate(() => {
     const el = document.querySelector('ul.seasons-list');
     return el ? el.innerHTML : null;

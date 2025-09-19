@@ -33,6 +33,7 @@ export async function GET() {
         'Content-Disposition': `inline; filename="${fileName}"`,
       },
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     console.error('[ERROR] Failed to read file:', err);
     return new Response(

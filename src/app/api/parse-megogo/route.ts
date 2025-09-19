@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';
 
 const launchBrowser = async () => {
-  // const chromiumPack =
-  //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
+  const chromiumPack =
+    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
   const isVercel = !!process.env.AWS_REGION || !!process.env.VERCEL;
   if (isVercel) {
     return await puppeteer.launch({
       args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: await chromium.executablePath(),
+      executablePath: await chromium.executablePath(chromiumPack),
       headless: true,
 
       defaultViewport: { width: 1280, height: 720 },
@@ -60,13 +60,20 @@ async function parseMegogo(url: string) {
   });
   console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
 
+  await page.waitForFunction(
+    () => !!document.querySelector('ul.seasons-list'),
+    {
+      timeout: 60000,
+    },
+  );
+
   const ulSeasonsList = await page.evaluate(() => {
     const el = document.querySelector('ul.seasons-list');
     return el ? el.innerHTML : null;
   });
   console.log('Page ulSeasonsList snapshot:', ulSeasonsList);
 
-  await page.waitForSelector('ul.seasons-list', { timeout: 10000 });
+  // await page.waitForSelector('ul.seasons-list');
 
   const seasons = await page.$$eval('ul.seasons-list li a', links =>
     links.map(a => ({

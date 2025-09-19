@@ -54,6 +54,8 @@ async function parseMegogo(url: string) {
     return h1 ? h1.textContent?.trim() : '';
   });
   console.log('🚀 ~ parseMegogo ~ pageTitle:', pageTitle);
+  const html = await page.content();
+  console.log('Page HTML snapshot:', html);
 
   await page.waitForSelector('ul.seasons-list');
 

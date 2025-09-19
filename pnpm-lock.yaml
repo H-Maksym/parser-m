@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@sparticuz/chromium-min':
-        specifier: ^138.0.2
-        version: 138.0.2
+        specifier: 121.0.0
+        version: 121.0.0
       add:
         specifier: ^2.0.6
         version: 2.0.6
@@ -539,9 +539,9 @@ packages:
   '@rushstack/eslint-patch@1.12.0':
     resolution: {integrity: sha512-5EwMtOqvJMMa3HbmxLlF74e+3/HhwBTMcvt3nqVJgGCozO6hzIPOBlwm8mGVNR9SN2IJpxSnlxczyDjcn7qIyw==}
 
-  '@sparticuz/chromium-min@138.0.2':
-    resolution: {integrity: sha512-L+QzPHJlm4TYOwIGIhIGg7P9zO6bmWJJP+nBpb+Hh0EySJhXi1bAEU61zcAj5S4Lc0F/JFA4EF8b5qXZfIBO7A==}
-    engines: {node: '>=20.11.0'}
+  '@sparticuz/chromium-min@121.0.0':
+    resolution: {integrity: sha512-gdgL9W3WsPcuIJL/Xmz3jhbh8HbNHXQ3WgTyZ8bQ+76y3/nF58S2WACgGQADr2B98xPndSEDs0MWqr3kBb2qcQ==}
+    engines: {node: '>= 16'}
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -2750,7 +2750,7 @@ snapshots:
 
   '@rushstack/eslint-patch@1.12.0': {}
 
-  '@sparticuz/chromium-min@138.0.2':
+  '@sparticuz/chromium-min@121.0.0':
     dependencies:
       follow-redirects: 1.15.11
       tar-fs: 3.1.1

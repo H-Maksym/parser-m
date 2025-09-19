@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';
 
 const launchBrowser = async () => {
-  const chromiumPack = 'https://my-domain/chromium-v121.0.0-pack.tar';
+  const chromiumPack =
+    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
   const isVercel = !!process.env.AWS_REGION || !!process.env.VERCEL;
   if (isVercel) {

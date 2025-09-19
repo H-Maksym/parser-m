@@ -53,7 +53,7 @@ async function parseMegogo(url: string) {
     // userAgentMetadata: { ... } // це можна пропустити, якщо не хочеш додавати метадані
   });
 
-  await page.goto(url, { waitUntil: 'networkidle2' });
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
 
   const pageTitle = await page.evaluate(() => {
     const h1 = document.querySelector('h1.video-title[itemprop="name"]');
@@ -65,7 +65,7 @@ async function parseMegogo(url: string) {
     const el = document.querySelector('ul.seasons-list');
     return el ? el.innerHTML : null;
   });
-  console.log('Page HTML snapshot:', ulSeasonsList);
+  console.log('Page ulSeasonsList snapshot:', ulSeasonsList);
 
   await page.waitForSelector('ul.seasons-list');
 

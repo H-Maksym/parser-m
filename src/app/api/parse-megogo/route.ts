@@ -1,5 +1,4 @@
 import chromium from '@sparticuz/chromium';
-import fs from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';
 const launchBrowser = async () => {
@@ -52,7 +51,10 @@ async function parseMegogo(url: string) {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
   });
 
-  const response = await page.goto(url, { waitUntil: 'networkidle2' });
+  const response = await page.goto(url, {
+    waitUntil: 'domcontentloaded',
+    timeout: 10000,
+  });
 
   if (!response || !response.ok()) {
     console.error(
@@ -83,7 +85,9 @@ async function parseMegogo(url: string) {
 
   // Якщо хочеш подивитись конкретний елемент
   const mainElementHtml = await page.evaluate(() => {
-    const main = document.querySelector('main div.videoView-episodes');
+    const main = document.querySelector(
+      'main section.widget.videoView_v2.product-main',
+    );
     // або потрібний селектор
     return main ? main.innerHTML : null;
   });

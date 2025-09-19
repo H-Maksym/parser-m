@@ -57,16 +57,23 @@ async function parseMegogo(url: string) {
   // Блокуємо аналітику, рекламу, трекери
   await page.setRequestInterception(true);
   page.on('request', req => {
+    const url = req.url();
+
     const blockedResources = [
       'google-analytics.com',
       'bluekai.com',
       'mgid.com',
       'admixer.net',
       'megogo.net/v5/tracker',
+      'adtcdn.com',
+      'googletagservices.com',
+      'doubleclick.net',
+      'googletagmanager.com',
+      'gstatic.com/prebid',
     ];
-    const url = req.url();
+
     if (blockedResources.some(domain => url.includes(domain))) {
-      // console.log('⛔ Blocked:', url);
+      console.log('⛔ Blocked:', url);
       req.abort();
     } else {
       req.continue();
@@ -111,7 +118,15 @@ async function parseMegogo(url: string) {
     );
     return main ? main.innerHTML : null;
   });
-  console.log('🧾 Main element content:', mainSectionHtml);
+  console.log('🧾 mainSectionHtml:', mainSectionHtml);
+
+  const videoEpisodes = await page.evaluate(() => {
+    const main = document.querySelector(
+      'main section.widget.videoView_v2.product-main div.videoView-episodes',
+    );
+    return main ? main.innerHTML : null;
+  });
+  console.log('🧾 videoEpisodes:', videoEpisodes);
 
   const hasVideoPlayer = await page.evaluate(() => {
     page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));

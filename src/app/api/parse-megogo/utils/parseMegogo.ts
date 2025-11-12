@@ -25,6 +25,12 @@ import puppeteer from 'puppeteer-core';
 const isRemote =
   !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
 
+// const launchBrowser = async () => {
+//   return await puppeteer.connect({
+//     browserWSEndpoint: 'wss://chrome.browserless.io?token=YOUR_API_TOKEN',
+//   });
+// };
+
 const launchBrowser = async () => {
   const chromiumPack =
     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
@@ -119,26 +125,34 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // Чекаємо поки кнопка з'явиться в DOM
-  //   await page.waitForSelector(
-  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-  //     { timeout: 5000 },
-  //   );
+  const html = await page.content();
+  console.log('before-------------:', html); // дивимось, чи є див із класами
 
-  const btnAge = await page.evaluate(() => {
-    const btn = document.querySelector(
-      '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-    );
-    return btn ? btn.innerHTML : null;
-  });
-  console.log('🎬 btnAge:', btnAge);
-
-  await new Promise(resolve => setTimeout(resolve, 5000));
-
-  //  Клікаємо по кнопці
+  await page.waitForSelector(
+    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+    { visible: true, timeout: 10000 }, // чекаємо до 10 секунд
+  );
   await page.click(
     '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
   );
+
+  const html1 = await page.content();
+  console.log('after-------------------:', html1); // дивимось, чи є див із класами
+
+  // const btnAge = await page.evaluate(() => {
+  //   const btn = document.querySelector(
+  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+  //   );
+  //   return btn ? btn.innerHTML : null;
+  // });
+  // console.log('🎬 btnAge:', btnAge);
+
+  // await new Promise(resolve => setTimeout(resolve, 5000));
+
+  // //  Клікаємо по кнопці
+  // await page.click(
+  //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  // );
 
   if (!response || !response.ok()) {
     console.error(

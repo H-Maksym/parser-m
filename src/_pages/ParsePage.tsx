@@ -81,6 +81,100 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
     }
   };
 
+  // 💾 Скачування Excel
+  // const handleDownloadExcel = async () => {
+  //   if (!inputUrl) return;
+
+  //   setLoading(true);
+
+  //   try {
+  //     const res = await fetch('/api/parse-megogo?format=excel', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ url: inputUrl }),
+  //     });
+
+  //     if (!res.ok) {
+  //       const errorData = await res.json();
+  //       setResult({
+  //         error: errorData.error || 'Помилка при завантаженні Excel',
+  //       });
+  //       return;
+  //     }
+
+  //     const blob = await res.blob();
+  //     const url = window.URL.createObjectURL(blob);
+  //     const link = document.createElement('a');
+  //     link.href = url;
+  //     link.download = 'episodes.xlsx';
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
+  //     window.URL.revokeObjectURL(url);
+
+  //     // setResult({ success: 'Excel файл успішно завантажено' });
+  //   } catch (err) {
+  //     setResult({ error: 'Помилка при скачуванні Excel', err });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const handleDownloadExcel = async () => {
+    if (!inputUrl) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/parse-megogo?format=excel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: inputUrl }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        setResult({
+          error: errorData.error || 'Помилка при завантаженні Excel',
+        });
+        return;
+      }
+
+      const blob = await res.blob();
+
+      // ✅ Отримати ім'я файлу з Content-Disposition
+      let filename = 'episodes.xlsx';
+      const disposition = res.headers.get('Content-Disposition');
+
+      if (disposition) {
+        const filenameStarMatch = disposition.match(
+          /filename\*=UTF-8''([^;\n]*)/,
+        );
+        const filenameMatch = disposition.match(/filename="([^"]+)"/);
+
+        if (filenameStarMatch && filenameStarMatch[1]) {
+          filename = decodeURIComponent(filenameStarMatch[1]);
+        } else if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // ⬇️ Створити посилання для завантаження
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setResult({ error: 'Помилка при скачуванні Excel', err });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 📋 Копіювання JSON у буфер
   const handleCopy = () => {
     if (!result) return;
@@ -130,6 +224,14 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
               className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition disabled:opacity-50"
             >
               Завантажити CSV
+            </button>
+
+            <button
+              onClick={handleDownloadExcel}
+              disabled={loading}
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition disabled:opacity-50"
+            >
+              Завантажити Excel
             </button>
           </div>
 

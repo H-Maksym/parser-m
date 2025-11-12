@@ -10,8 +10,8 @@
     "parse:megogo": "tsx scripts/parse-megogo.ts"
   },
   "dependencies": {
-    "@sparticuz/chromium-min": "121.0.0",
     "@sparticuz/chromium": "121.0.0",
+    "@sparticuz/chromium-min": "121.0.0",
     "add": "^2.0.6",
     "cheerio": "^1.1.2",
     "domhandler": "^5.0.3",
@@ -19,7 +19,8 @@
     "pnpm": "^10.17.0",
     "puppeteer-core": "^24.22.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

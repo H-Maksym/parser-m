@@ -1,5 +1,5 @@
 # 1. Базовий образ з Node.js 20 для більшої сумісності (Debian-based)
-FROM node:20 AS builder
+FROM node:22 AS builder
 
 ENV IS_DOCKER=true
 
@@ -31,7 +31,9 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # 2. Встановлюємо pnpm глобально
-RUN npm install -g pnpm
+# RUN npm install -g pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 
 # 3. Встановлюємо робочу директорію
 WORKDIR /app
@@ -39,8 +41,9 @@ WORKDIR /app
 # 4. Копіюємо package.json і pnpm-lock.yaml (якщо є)
 COPY package.json pnpm-lock.yaml* ./
 
+
 # Очищаємо кеш pnpm, щоб уникнути проблем з залежностями
-RUN pnpm store prune
+RUN pnpm store prune 
 
 # 5. Встановлюємо залежності
 RUN pnpm install --frozen-lockfile
@@ -59,7 +62,7 @@ RUN pnpm build
 # ---------------
 
 # 9. Другий етап — створення мінімального production образу
-FROM node:20 AS runner
+FROM node:22 AS runner
 
 ENV IS_DOCKER=true
 
@@ -90,7 +93,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # 10. Встановлюємо pnpm (можна не ставити, якщо не потрібен у runtime)
-RUN npm install -g pnpm
+# RUN npm install -g pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # 11. Копіюємо залежності production
 COPY --from=builder /app/node_modules ./node_modules
@@ -114,5 +118,6 @@ CMD ["pnpm", "start"]
 
 #Команди для перевірки локально - має бути запущений Docker Desktop на комп'ютері
 # docker build -t parser-m .
+# docker build --no-cache -t parser-m .
 # docker run -p 3000:3000 parser-m
 

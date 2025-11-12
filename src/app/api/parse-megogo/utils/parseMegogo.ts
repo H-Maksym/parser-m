@@ -22,8 +22,8 @@ import puppeteer from 'puppeteer-core';
 //   }
 // };
 
-const isRemote =
-  !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
+const isRemote = true;
+// !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
 
 // const launchBrowser = async () => {
 //   return await puppeteer.connect({
@@ -48,6 +48,7 @@ const launchBrowser = async () => {
 
   if (isRemote) {
     return await puppeteer.launch({
+      headless: false,
       args: [
         ...chromium.args,
         '--no-sandbox',
@@ -125,26 +126,28 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  try {
-    await page.waitForSelector(
-      '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-      { visible: true, timeout: 5000 },
-    );
-    await page.click(
-      '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-    );
-  } catch (err) {
-    console.log('Кнопка підтвердження віку не з’явилась');
-  }
+  const html = await page.content();
+  console.log(
+    ' -------HTML console -------',
+    html.includes('js-start-screen-blocker'),
+  );
 
   await page.waitForFunction(
     () => {
-      return document.querySelector(
+      const btn = document.querySelector(
         '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-      );
+      ) as HTMLElement | null; // кастинг
+      return btn !== null && btn.offsetParent !== null; // перевіряємо видимість
     },
     { timeout: 10000 },
   );
+
+  await page.evaluate(() => {
+    const btn = document.querySelector(
+      '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+    ) as HTMLElement | null;
+    if (btn) btn.click();
+  });
 
   // await page.waitForSelector(
   //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',

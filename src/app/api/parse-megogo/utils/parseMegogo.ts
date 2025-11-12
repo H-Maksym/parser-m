@@ -1,44 +1,65 @@
-import chromium from '@sparticuz/chromium';
+// import chromium from '@sparticuz/chromium';
+// import puppeteer from 'puppeteer-core';
+
+import chromium from '@sparticuz/chromium-min';
 import puppeteer from 'puppeteer-core';
 
 const isRemote =
   !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
 
-const launchBrowser = async () => {
-  const chromiumPack =
-    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
-
-  const isDocker = !!process.env.IS_DOCKER; // додай цю змінну в свій Docker контейнер через ENV
-
-  // Визначення URL
-  const urlChromium = isRemote
-    ? chromiumPack
-    : isDocker
-      ? '/usr/local/bin/chromium' // шлях до кастомного Chromium у контейнері
-      : 'http://localhost:3000'; // локально, якщо ні Vercel, ні Docker
-
-  // launchBrowser залишається як раніше, тільки з цією змінною url можна далі працювати
-
+export const launchBrowser = async () => {
   if (isRemote) {
     return await puppeteer.launch({
-      args: [
-        ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--autoplay-policy=no-user-gesture-required',
-        '--disable-features=IsolateOrigins,site-per-process',
-        '--disable-background-timer-throttling',
-        '--disable-renderer-backgrounding',
-      ],
-      executablePath: await chromium.executablePath(urlChromium),
-
+      args: chromium.args,
       defaultViewport: { width: 1280, height: 720 },
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     });
   } else {
+    // Локальний запуск (якщо не на Vercel)
     const puppeteerLocal = await import('puppeteer');
     return await puppeteerLocal.default.launch({ headless: true });
   }
 };
+
+// const isRemote =
+//   !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
+
+// const launchBrowser = async () => {
+//   const chromiumPack =
+//     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
+
+//   const isDocker = !!process.env.IS_DOCKER; // додай цю змінну в свій Docker контейнер через ENV
+
+//   // Визначення URL
+//   const urlChromium = isRemote
+//     ? chromiumPack
+//     : isDocker
+//       ? '/usr/local/bin/chromium' // шлях до кастомного Chromium у контейнері
+//       : 'http://localhost:3000'; // локально, якщо ні Vercel, ні Docker
+
+//   // launchBrowser залишається як раніше, тільки з цією змінною url можна далі працювати
+
+//   if (isRemote) {
+//     return await puppeteer.launch({
+//       args: [
+//         ...chromium.args,
+//         '--no-sandbox',
+//         '--disable-setuid-sandbox',
+//         '--autoplay-policy=no-user-gesture-required',
+//         '--disable-features=IsolateOrigins,site-per-process',
+//         '--disable-background-timer-throttling',
+//         '--disable-renderer-backgrounding',
+//       ],
+//       executablePath: await chromium.executablePath(urlChromium),
+
+//       defaultViewport: { width: 1280, height: 720 },
+//     });
+//   } else {
+//     const puppeteerLocal = await import('puppeteer');
+//     return await puppeteerLocal.default.launch({ headless: true });
+//   }
+// };
 
 export async function parseMegogo(url: string) {
   const browser = await launchBrowser();

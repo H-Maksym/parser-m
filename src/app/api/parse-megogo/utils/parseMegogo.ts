@@ -1,9 +1,11 @@
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
-// import chromium from '@sparticuz/chromium-min';
-// import puppeteer from 'puppeteer-core';
-
+// const launchBrowser = async () => {
+//   return await puppeteer.connect({
+//     browserWSEndpoint: 'wss://chrome.browserless.io?token=YOUR_API_TOKEN',
+//   });
+// };
 // const isRemote =
 //   !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
 
@@ -22,14 +24,11 @@ import puppeteer from 'puppeteer-core';
 //   }
 // };
 
-const isRemote = true;
-// !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
-
-// const launchBrowser = async () => {
-//   return await puppeteer.connect({
-//     browserWSEndpoint: 'wss://chrome.browserless.io?token=YOUR_API_TOKEN',
-//   });
-// };
+const isRemote =
+  !!process.env.AWS_REGION ||
+  !!process.env.VERCEL ||
+  !!process.env.IS_DOCKER ||
+  !!process.env.IS_RENDER;
 
 const launchBrowser = async () => {
   const chromiumPack =
@@ -73,33 +72,44 @@ export async function parseMegogo(url: string) {
   const page = await browser.newPage();
 
   // Блокуємо аналітику, рекламу, трекери
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const url = req.url();
-    const blockedResources = [
-      'google-analytics.com',
-      'bluekai.com',
-      'mgid.com',
-      'admixer.net',
-      'megogo.net/v5/tracker',
-      'adtcdn.com',
-      'googletagservices.com',
-      'doubleclick.net',
-      'googletagmanager.com',
-      'gstatic.com/prebid',
-    ];
-    if (blockedResources.some(domain => url.includes(domain))) {
-      // console.log('⛔ Blocked:', url);
-      req.abort();
-    } else {
-      req.continue();
-    }
-  });
+  // await page.setRequestInterception(true);
+  // page.on('request', req => {
+  //   const url = req.url();
+  //   const blockedResources = [
+  //     'google-analytics.com',
+  //     'bluekai.com',
+  //     'mgid.com',
+  //     'admixer.net',
+  //     'megogo.net/v5/tracker',
+  //     'adtcdn.com',
+  //     'googletagservices.com',
+  //     'doubleclick.net',
+  //     'googletagmanager.com',
+  //     'gstatic.com/prebid',
+  //   ];
+  //   if (blockedResources.some(domain => url.includes(domain))) {
+  //     // console.log('⛔ Blocked:', url);
+  //     req.abort();
+  //   } else {
+  //     req.continue();
+  //   }
+  // });
+  //1️⃣ Логування DOM (щоб побачити, що реально бачить Puppeteer)
+  await page.goto(url, { waitUntil: 'networkidle2' });
+
+  const html = await page.content();
+  console.log('🔍 Чи є popup у DOM:', html.includes('popup-21-consent'));
+  console.log('🔍 Чи є кнопка:', html.includes('data-element-code="continue"'));
 
   // Встановлюємо User-Agent
   await page.setUserAgent({
     userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  });
+
+  await page.setViewport({ width: 1366, height: 768 });
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
   });
 
   // Логування помилок
@@ -115,8 +125,8 @@ export async function parseMegogo(url: string) {
   });
 
   //Прочитати кукіси
-  //   const cookies = await page.cookies();
-  //   console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
+  const cookies = await page.cookies();
+  console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 
   // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;
@@ -126,26 +136,21 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const html = await page.content();
-  console.log(
-    ' -------HTML console -------',
-    html.includes('js-start-screen-blocker'),
-  );
-
-  await page.waitForFunction(
-    () => {
-      const btn = document.querySelector(
-        '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-      ) as HTMLElement | null; // кастинг
-      return btn !== null && btn.offsetParent !== null; // перевіряємо видимість
-    },
-    { timeout: 10000 },
-  );
+  // await page.waitForFunction(
+  //   () => {
+  //     const btn = document.querySelector(
+  //       '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  //     ) as HTMLElement | null; // кастинг
+  //     return btn !== null && btn.offsetParent !== null; // перевіряємо видимість
+  //   },
+  //   { timeout: 30000 },
+  // );
 
   await page.evaluate(() => {
     const btn = document.querySelector(
       '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
     ) as HTMLElement | null;
+    console.log('🚀 ~ 🎬 btnAge - btn:', btn);
     if (btn) btn.click();
   });
 
@@ -156,9 +161,6 @@ export async function parseMegogo(url: string) {
   // await page.click(
   //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
   // );
-
-  const html1 = await page.content();
-  console.log('after-------------------:', html1); // дивимось, чи є див із класами
 
   // const btnAge = await page.evaluate(() => {
   //   const btn = document.querySelector(

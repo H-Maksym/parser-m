@@ -278,7 +278,7 @@ export const launchBrowser = async () => {
 
   await page.evaluateOnNewDocument(() => {
     Object.defineProperty(navigator, 'webdriver', { get: () => false });
-    // @ts-ignore
+    // @ts-expect-error mock chrome.runtime for tests
     window.chrome = { runtime: {} };
     Object.defineProperty(navigator, 'languages', {
       get: () => ['uk-UA', 'uk'],

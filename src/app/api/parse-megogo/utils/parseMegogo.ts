@@ -124,6 +124,12 @@ export async function parseMegogo(url: string) {
     waitUntil: 'domcontentloaded',
   });
 
+  //навігація користувачем
+  // await page.mouse.move(200, 200);
+  // await page.mouse.click(200, 200);
+  // await page.keyboard.press('ArrowDown');
+  // await page.waitForTimeout(3000);
+
   //Прочитати кукіси
   const cookies = await page.cookies();
   console.log('🚀 ~ parseMegogo ~ cookies:', cookies);

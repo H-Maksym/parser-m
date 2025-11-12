@@ -125,16 +125,34 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const html = await page.content();
-  console.log('before-------------:', html); // дивимось, чи є див із класами
+  try {
+    await page.waitForSelector(
+      '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+      { visible: true, timeout: 5000 },
+    );
+    await page.click(
+      '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+    );
+  } catch (err) {
+    console.log('Кнопка підтвердження віку не з’явилась');
+  }
 
-  await page.waitForSelector(
-    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-    { visible: true, timeout: 10000 }, // чекаємо до 10 секунд
+  await page.waitForFunction(
+    () => {
+      return document.querySelector(
+        '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+      );
+    },
+    { timeout: 10000 },
   );
-  await page.click(
-    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  );
+
+  // await page.waitForSelector(
+  //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  //   { visible: true, timeout: 10000 }, // чекаємо до 10 секунд
+  // );
+  // await page.click(
+  //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  // );
 
   const html1 = await page.content();
   console.log('after-------------------:', html1); // дивимось, чи є див із класами

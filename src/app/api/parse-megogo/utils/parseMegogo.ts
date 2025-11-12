@@ -1,99 +1,142 @@
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
-// const launchBrowser = async () => {
-//   return await puppeteer.connect({
-//     browserWSEndpoint: 'wss://chrome.browserless.io?token=YOUR_API_TOKEN',
-//   });
-// };
-// const isRemote =
-//   !!process.env.AWS_REGION || !!process.env.VERCEL || !!process.env.IS_DOCKER;
-
-// export const launchBrowser = async () => {
-//   if (isRemote) {
-//     return await puppeteer.launch({
-//       args: chromium.args,
-//       defaultViewport: { width: 1280, height: 720 },
-//       executablePath: await chromium.executablePath(),
-//       headless: chromium.headless,
-//     });
-//   } else {
-//     // Локальний запуск (якщо не на Vercel)
-//     const puppeteerLocal = await import('puppeteer');
-//     return await puppeteerLocal.default.launch({ headless: true });
-//   }
-// };
-
 const isRemote =
   !!process.env.AWS_REGION ||
   !!process.env.VERCEL ||
   !!process.env.IS_DOCKER ||
   !!process.env.IS_RENDER;
 
-const launchBrowser = async () => {
+// const launchBrowser = async () => {
+//   const chromiumPack =
+//     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
+
+//   const isDocker = !!process.env.IS_DOCKER; // додай цю змінну в свій Docker контейнер через ENV
+
+//   // Визначення URL
+//   const urlChromium = isRemote
+//     ? chromiumPack
+//     : isDocker
+//       ? '/usr/local/bin/chromium' // шлях до кастомного Chromium у контейнері
+//       : 'http://localhost:3000'; // локально, якщо ні Vercel, ні Docker
+
+//   // launchBrowser залишається як раніше, тільки з цією змінною url можна далі працювати
+
+//   if (isRemote) {
+//     return await puppeteer.launch({
+//       headless: false,
+//       args: [
+//         ...chromium.args,
+//         '--no-sandbox',
+//         '--disable-setuid-sandbox',
+//         '--autoplay-policy=no-user-gesture-required',
+//         '--disable-features=IsolateOrigins,site-per-process',
+//         '--disable-background-timer-throttling',
+//         '--disable-renderer-backgrounding',
+//       ],
+//       executablePath: await chromium.executablePath(urlChromium),
+
+//       defaultViewport: { width: 1280, height: 720 },
+//     });
+//   } else {
+//     const puppeteerLocal = await import('puppeteer');
+//     return await puppeteerLocal.default.launch({ headless: true });
+//   }
+// };
+
+export const launchBrowser = async () => {
   const chromiumPack =
     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
-  const isDocker = !!process.env.IS_DOCKER; // додай цю змінну в свій Docker контейнер через ENV
+  const isDocker = !!process.env.IS_DOCKER;
 
-  // Визначення URL
   const urlChromium = isRemote
     ? chromiumPack
     : isDocker
-      ? '/usr/local/bin/chromium' // шлях до кастомного Chromium у контейнері
-      : 'http://localhost:3000'; // локально, якщо ні Vercel, ні Docker
+      ? '/usr/bin/chromium' // у Docker
+      : null;
 
-  // launchBrowser залишається як раніше, тільки з цією змінною url можна далі працювати
+  let browser;
 
   if (isRemote) {
-    return await puppeteer.launch({
-      headless: false,
+    browser = await puppeteer.launch({
+      headless: 'new' as any, // новий headless режим Chrome
       args: [
         ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--autoplay-policy=no-user-gesture-required',
-        '--disable-features=IsolateOrigins,site-per-process',
-        '--disable-background-timer-throttling',
-        '--disable-renderer-backgrounding',
+        '--disable-dev-shm-usage',
+        '--window-size=1366,768',
+        '--disable-gpu',
       ],
-      executablePath: await chromium.executablePath(urlChromium),
-
-      defaultViewport: { width: 1280, height: 720 },
+      executablePath: await chromium.executablePath(urlChromium ?? undefined),
+      defaultViewport: { width: 1366, height: 768 },
     });
   } else {
     const puppeteerLocal = await import('puppeteer');
-    return await puppeteerLocal.default.launch({ headless: true });
+    browser = await puppeteerLocal.default.launch({
+      headless: false,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      defaultViewport: { width: 1366, height: 768 },
+    });
   }
+
+  // 🧠 Маскування Puppeteer під справжній Chrome
+  const page = await browser.newPage();
+
+  await page.setUserAgent({
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  });
+
+  await page.evaluateOnNewDocument(() => {
+    // ❌ Ховаємо, що це Puppeteer
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+
+    // 🧩 Імітуємо Chrome API
+    // @ts-ignore
+    window.chrome = { runtime: {} };
+
+    // 🌐 Імітуємо мову користувача
+    Object.defineProperty(navigator, 'languages', {
+      get: () => ['uk-UA', 'uk'],
+    });
+
+    // 🔌 Імітуємо плагіни
+    Object.defineProperty(navigator, 'plugins', {
+      get: () => [1, 2, 3, 4],
+    });
+  });
+
+  //навігація користувачем
+  // await page.mouse.move(200, 200);
+  // await page.mouse.click(200, 200);
+  // await page.keyboard.press('ArrowDown');
+  // await page.waitForTimeout(3000);
+
+  // ✅ Дозволяємо рекламу і сторонні скрипти
+  await page.setBypassCSP(true);
+
+  // 🕵️‍♂️ Логування запитів (для дебагу)
+  page.on('requestfailed', req => {
+    console.log('❌ Blocked:', req.url());
+  });
+  page.on('requestfinished', req => {
+    const url = req.url();
+    if (
+      url.includes('ads.') ||
+      url.includes('megogo') ||
+      url.includes('doubleclick')
+    )
+      console.log('✅ Loaded:', url);
+  });
+  return browser;
 };
 
 export async function parseMegogo(url: string) {
   const browser = await launchBrowser();
   const page = await browser.newPage();
 
-  // Блокуємо аналітику, рекламу, трекери
-  // await page.setRequestInterception(true);
-  // page.on('request', req => {
-  //   const url = req.url();
-  //   const blockedResources = [
-  //     'google-analytics.com',
-  //     'bluekai.com',
-  //     'mgid.com',
-  //     'admixer.net',
-  //     'megogo.net/v5/tracker',
-  //     'adtcdn.com',
-  //     'googletagservices.com',
-  //     'doubleclick.net',
-  //     'googletagmanager.com',
-  //     'gstatic.com/prebid',
-  //   ];
-  //   if (blockedResources.some(domain => url.includes(domain))) {
-  //     // console.log('⛔ Blocked:', url);
-  //     req.abort();
-  //   } else {
-  //     req.continue();
-  //   }
-  // });
   //1️⃣ Логування DOM (щоб побачити, що реально бачить Puppeteer)
   await page.goto(url, { waitUntil: 'networkidle2' });
 
@@ -101,19 +144,8 @@ export async function parseMegogo(url: string) {
   console.log('🔍 Чи є popup у DOM:', html.includes('popup-21-consent'));
   console.log('🔍 Чи є кнопка:', html.includes('data-element-code="continue"'));
 
-  // Встановлюємо User-Agent
-  await page.setUserAgent({
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  });
-
-  await page.setViewport({ width: 1366, height: 768 });
-  await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-  });
-
   // Логування помилок
-  page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
+  // page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
   // page.on('requestfailed', req =>
   //   console.error('⚠️ Request failed:', req.url(), req.failure()),
   // );
@@ -123,12 +155,6 @@ export async function parseMegogo(url: string) {
   const response = await page.goto(url, {
     waitUntil: 'domcontentloaded',
   });
-
-  //навігація користувачем
-  // await page.mouse.move(200, 200);
-  // await page.mouse.click(200, 200);
-  // await page.keyboard.press('ArrowDown');
-  // await page.waitForTimeout(3000);
 
   //Прочитати кукіси
   const cookies = await page.cookies();

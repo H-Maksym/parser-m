@@ -7,43 +7,6 @@ const isRemote =
   !!process.env.IS_DOCKER ||
   !!process.env.IS_RENDER;
 
-// const launchBrowser = async () => {
-//   const chromiumPack =
-//     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
-
-//   const isDocker = !!process.env.IS_DOCKER; // додай цю змінну в свій Docker контейнер через ENV
-
-//   // Визначення URL
-//   const urlChromium = isRemote
-//     ? chromiumPack
-//     : isDocker
-//       ? '/usr/local/bin/chromium' // шлях до кастомного Chromium у контейнері
-//       : 'http://localhost:3000'; // локально, якщо ні Vercel, ні Docker
-
-//   // launchBrowser залишається як раніше, тільки з цією змінною url можна далі працювати
-
-//   if (isRemote) {
-//     return await puppeteer.launch({
-//       headless: false,
-//       args: [
-//         ...chromium.args,
-//         '--no-sandbox',
-//         '--disable-setuid-sandbox',
-//         '--autoplay-policy=no-user-gesture-required',
-//         '--disable-features=IsolateOrigins,site-per-process',
-//         '--disable-background-timer-throttling',
-//         '--disable-renderer-backgrounding',
-//       ],
-//       executablePath: await chromium.executablePath(urlChromium),
-
-//       defaultViewport: { width: 1280, height: 720 },
-//     });
-//   } else {
-//     const puppeteerLocal = await import('puppeteer');
-//     return await puppeteerLocal.default.launch({ headless: true });
-//   }
-// };
-
 export const launchBrowser = async () => {
   const chromiumPack =
     'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
@@ -60,7 +23,7 @@ export const launchBrowser = async () => {
 
   if (isRemote) {
     browser = await puppeteer.launch({
-      headless: 'new' as any, // новий headless режим Chrome
+      headless: true,
       args: [
         ...chromium.args,
         '--no-sandbox',
@@ -94,7 +57,7 @@ export const launchBrowser = async () => {
     Object.defineProperty(navigator, 'webdriver', { get: () => false });
 
     // 🧩 Імітуємо Chrome API
-    // @ts-ignore
+    // @ts-expect-error mock chrome.runtime for tests
     window.chrome = { runtime: {} };
 
     // 🌐 Імітуємо мову користувача

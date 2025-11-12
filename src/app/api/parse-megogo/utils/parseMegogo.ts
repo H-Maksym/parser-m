@@ -28,7 +28,7 @@ export const launchBrowser = async () => {
         ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-blink-features=AutomationControlled',
+        // '--disable-blink-features=AutomationControlled',
       ],
       executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
@@ -63,15 +63,15 @@ export const launchBrowser = async () => {
     'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
   });
 
-  await page.setBypassCSP(true);
+  // await page.setBypassCSP(true);
 
   // Логування реклами без блокування Megogo API
-  page.on('requestfailed', req => {
-    const url = req.url();
-    if (url.includes('ads.') || url.includes('doubleclick')) {
-      console.log('❌ Blocked ad:', url);
-    }
-  });
+  // page.on('requestfailed', req => {
+  //   const url = req.url();
+  //   if (url.includes('ads.') || url.includes('doubleclick')) {
+  //     console.log('❌ Blocked ad:', url);
+  //   }
+  // });
 
   return { browser, page };
 };
@@ -83,18 +83,19 @@ export async function parseMegogo(url: string) {
   await page.setRequestInterception(true);
   page.on('request', req => {
     const url = req.url();
-    const blockedResources = [
-      'google-analytics.com',
-      'bluekai.com',
-      'mgid.com',
-      'admixer.net',
-      'megogo.net/v5/tracker',
-      'adtcdn.com',
-      'googletagservices.com',
-      'doubleclick.net',
-      'googletagmanager.com',
-      'gstatic.com/prebid',
-    ];
+    const blockedResources = [''];
+    // [
+    //   'google-analytics.com',
+    //   'bluekai.com',
+    //   'mgid.com',
+    //   'admixer.net',
+    //   'megogo.net/v5/tracker',
+    //   'adtcdn.com',
+    //   'googletagservices.com',
+    //   'doubleclick.net',
+    //   'googletagmanager.com',
+    //   'gstatic.com/prebid',
+    // ];
     if (blockedResources.some(domain => url.includes(domain))) {
       // console.log('⛔ Blocked:', url);
       req.abort();

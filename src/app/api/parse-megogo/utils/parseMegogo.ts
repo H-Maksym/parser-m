@@ -1,3 +1,5 @@
+// https://megogo.net/ua/view/2435691-kozaki-futbol.html
+
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
@@ -180,29 +182,32 @@ export async function parseMegogo(url: string) {
   // }
 
   // Чекаємо поки кнопка з'явиться в DOM
-  //   await page.waitForSelector(
-  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-  //     { timeout: 5000 },
-  //   );
+  // await page.waitForSelector(
+  //   '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+  //   { timeout: 5000 },
+  // );
 
   // Знайти div з текстом "Подтверждаю"
-  const button = await page.waitForFunction(
-    () => {
-      return (
-        Array.from(document.querySelectorAll('div')).find(el =>
-          el.textContent?.includes('Прийняти'),
-        ) || null
-      );
-    },
-    { timeout: 5000 },
-  );
 
+  const button = await page.$eval('div.consent-content', el => el.innerText);
   if (button) {
-    const html = await page.evaluate(el => el?.outerHTML, button);
-    console.log('HTML елемента:\n', html);
+    console.log('HTML елемента:\n', button);
   } else {
     console.log('Елемент не знайдено');
   }
+
+  // const button = await page.waitForFunction(
+  //   () => {
+  //     return (
+  //       Array.from(document.querySelectorAll('div')).find(
+  //         el =>
+  //           el.textContent?.includes('Прийняти') ||
+  //           el.textContent?.includes('Підтверджую'),
+  //       ) || null
+  //     );
+  //   },
+  //   { timeout: 5000 },
+  // );
 
   //Вивести всі кнопки
   // const buttons = await page.$$eval('div', els =>

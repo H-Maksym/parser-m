@@ -131,13 +131,16 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  await page.evaluate(() => window.scrollBy(400, document.body.scrollHeight));
-
-  const pdfFileName = `pdfFileName.pdf`;
-  const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;
-  await page.pdf({
-    path: pdfPath,
-  });
+  try {
+    await page.evaluate(() => window.scrollBy(400, document.body.scrollHeight));
+    const pdfFileName = `pdfFileName.pdf`;
+    const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;
+    await page.pdf({
+      path: pdfPath,
+    });
+  } catch (error) {
+    console.log('error in try-catch', error);
+  }
 
   // Чекаємо поки кнопка з'явиться в DOM
   //   await page.waitForSelector(

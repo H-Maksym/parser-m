@@ -185,14 +185,15 @@ export async function parseMegogo(url: string) {
   //     { timeout: 5000 },
   //   );
 
-  const buttons = await page.$$eval('button', els =>
-    els.map(el => ({
-      text: el.innerText.trim(),
-      class: el.className,
-      attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-    })),
-  );
-  console.log('🚀 ~ parseMegogo ~ buttons:', buttons);
+  //Вивести всі кнопки
+  // const buttons = await page.$$eval('button', els =>
+  //   els.map(el => ({
+  //     text: el.innerText.trim(),
+  //     class: el.className,
+  //     attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
+  //   })),
+  // );
+  // console.log('🚀 ~ parseMegogo ~ buttons:', buttons);
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(

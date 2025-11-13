@@ -140,14 +140,14 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const searchText = 'Принять все'; // шукаєш цей текст
-  const [el] = await page.$$(`//*[contains(., "${searchText}")]`);
-  if (el) {
-    const html = await page.evaluate(el => el.outerHTML, el);
-    console.log(html);
-  } else {
-    console.log('Елемент не знайдено');
-  }
+  const text = 'Мы заботимся о вашей конфиденциальности';
+  const elementsHTML = await page.evaluate(text => {
+    return Array.from(document.querySelectorAll('*'))
+      .filter(e => e.textContent && e.textContent.includes(text))
+      .map(e => e.outerHTML);
+  }, text);
+
+  console.log(elementsHTML);
 
   // Чекаємо поки кнопка з'явиться в DOM
   //   await page.waitForSelector(

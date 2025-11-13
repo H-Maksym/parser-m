@@ -140,14 +140,37 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const text = 'Мы заботимся о вашей конфиденциальности';
+  const text = 'Принять все';
   const elementsHTML = await page.evaluate(text => {
     return Array.from(document.querySelectorAll('*'))
-      .filter(e => e.textContent && e.textContent.includes(text))
-      .map(e => e.outerHTML);
+      .filter(
+        e =>
+          e.textContent.toLowerCase() &&
+          e.textContent.includes(text.toLowerCase()),
+      )
+      .map(e => {
+        console.log('🚀 ~ parseMegogo ~ e:', e);
+        return e.outerHTML;
+      });
   }, text);
 
-  console.log(elementsHTML);
+  console.log('-----Кукіси-----', elementsHTML);
+
+  const text2 = 'Принять только';
+  const elementsHTML2 = await page.evaluate(text => {
+    return Array.from(document.querySelectorAll('*'))
+      .filter(
+        e =>
+          e.textContent.toLowerCase() &&
+          e.textContent.includes(text.toLowerCase()),
+      )
+      .map(e => {
+        console.log('🚀 ~ parseMegogo ~ e:', e);
+        return e.outerHTML;
+      });
+  }, text2);
+
+  console.log('-----Кукіси--2---', elementsHTML2);
 
   // Чекаємо поки кнопка з'явиться в DOM
   //   await page.waitForSelector(

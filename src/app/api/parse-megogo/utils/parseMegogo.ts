@@ -80,7 +80,6 @@ export const launchBrowser = async () => {
 
 export async function parseMegogo(url: string) {
   const { browser, page } = await launchBrowser();
-
   // Блокуємо аналітику, рекламу, трекери
   // await page.setRequestInterception(true);
   // page.on('request', req => {
@@ -128,9 +127,11 @@ export async function parseMegogo(url: string) {
     timeout: 60000,
   });
 
-  //Прочитати кукіси
-  //   const cookies = await page.cookies();
-  //   console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
+  // Прочитати кукіси
+
+  const cookies = await browser.cookies();
+
+  console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 
   // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;
@@ -154,30 +155,30 @@ export async function parseMegogo(url: string) {
   // }, text);
 
   // console.log('-----Кукіси-----', elementsHTML);
-  const searchText = 'Принять все';
-  const searchText2 = 'Принять только';
+  // const searchText = 'Принять все';
+  // const searchText2 = 'Принять только';
 
-  const elements = await page.$$('button, a, p, div, h1, h2, h3 ');
+  // const elements = await page.$$('button, a, p, div, h1, h2, h3 ');
 
-  for (const el of elements) {
-    const text = await page.evaluate(
-      el => el.textContent.trim().toLowerCase(),
-      el,
-    );
-    if (text.includes(searchText.trim().toLowerCase())) {
-      // 🔍 тут умова пошуку по контенту
-      const includesHtml = await page.evaluate(el => el.outerHTML, el);
-      console.log('=== MATCH ===');
-      console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml);
-    }
+  // for (const el of elements) {
+  //   const text = await page.evaluate(
+  //     el => el.textContent.trim().toLowerCase(),
+  //     el,
+  //   );
+  //   if (text.includes(searchText.trim().toLowerCase())) {
+  //     // 🔍 тут умова пошуку по контенту
+  //     const includesHtml = await page.evaluate(el => el.outerHTML, el);
+  //     console.log('=== MATCH ===');
+  //     console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml);
+  //   }
 
-    if (text.includes(searchText2.trim().toLowerCase())) {
-      // 🔍 тут умова пошуку по контенту
-      const includesHtml2 = await page.evaluate(el => el.outerHTML, el);
-      console.log('=== MATCH ===');
-      console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml2);
-    }
-  }
+  //   if (text.includes(searchText2.trim().toLowerCase())) {
+  //     // 🔍 тут умова пошуку по контенту
+  //     const includesHtml2 = await page.evaluate(el => el.outerHTML, el);
+  //     console.log('=== MATCH ===');
+  //     console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml2);
+  //   }
+  // }
 
   // Чекаємо поки кнопка з'явиться в DOM
   //   await page.waitForSelector(

@@ -3,13 +3,13 @@ import puppeteer from 'puppeteer-core';
 
 const isRemote =
   !!process.env.AWS_REGION ||
-  !!process.env.VERCEL ||
+  !!process.env.IS_VERCEL ||
   !!process.env.IS_DOCKER ||
   !!process.env.IS_RENDER;
 
 export const launchBrowser = async () => {
-  // const chromiumPack =
-  //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
+  const chromiumPack =
+    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
   // const isDocker = !!process.env.IS_DOCKER;
 
@@ -32,6 +32,20 @@ export const launchBrowser = async () => {
         '--disable-blink-features=AutomationControlled',
       ],
       executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
+      // executablePath: await chromium.executablePath(urlChromium ?? undefined),
+      defaultViewport: { width: 1366, height: 768 },
+    });
+  } else if (!!process.env.IS_VERCEL) {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--ignore-certificate-errors',
+        '--disable-blink-features=AutomationControlled',
+      ],
+      executablePath: await chromium.executablePath(chromiumPack), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
     });

@@ -115,9 +115,9 @@ export async function parseMegogo(url: string) {
 
   // Логування помилок
   page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
-  page.on('requestfailed', req =>
-    console.error('⚠️ Request failed:', req.url(), req.failure()),
-  );
+  // page.on('requestfailed', req =>
+  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
+  // );
 
   // Завантажуємо сторінку з повним очікуванням
   const response = await page.goto(url, {
@@ -126,7 +126,6 @@ export async function parseMegogo(url: string) {
   });
 
   // Прочитати кукіси
-
   // const cookies = await browser.cookies();
   // console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 
@@ -138,11 +137,18 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // console.log('-----Кукіси-----', elementsHTML);
+  const pageContents = await page.content();
+  console.log('🚀 ~ parseMegogo ~ pageContents:', pageContents);
+
   // const searchText = 'Принять все';
   // const searchText2 = 'Принять только';
 
-  // const elements = await page.$$('button, a, p, div, h1, h2, h3 ');
+  // Знайти елементи
+  // const elements = await page.waitForSelector('button, a, p, div, h1, h2, h3', {
+  //   visible: true,
+  //   hidden: true,
+  //   timeout: 5000,
+  // });
 
   // for (const el of elements) {
   //   const text = await page.evaluate(

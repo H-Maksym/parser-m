@@ -131,15 +131,22 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
+  await page.evaluate(() => window.scrollBy(400, document.body.scrollHeight));
+
+  const pdfFileName = `pdfFileName.pdf`;
+  const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;
+  await page.pdf({
+    path: pdfPath,
+  });
+
   // Чекаємо поки кнопка з'явиться в DOM
   //   await page.waitForSelector(
   //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
   //     { timeout: 5000 },
   //   );
 
-  await page.waitForSelector('div.modal', { visible: true, timeout: 60000 });
-  const modals = await page.$$('div.modal');
-  console.log('🚀 ~ parseMegogo ~ modal:', modals);
+  // const modals = await page.$$('div.modal');
+  // console.log('🚀 ~ parseMegogo ~ modal:', modals);
   // const divs = await page.$$eval('div.modal', els =>
   //   els.map(el => ({
   //     text: el.innerText.trim(),

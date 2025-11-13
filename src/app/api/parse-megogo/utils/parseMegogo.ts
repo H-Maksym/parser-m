@@ -28,7 +28,7 @@ export const launchBrowser = async () => {
         ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        // '--disable-blink-features=AutomationControlled',
+        '--disable-blink-features=AutomationControlled',
       ],
       executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
@@ -63,7 +63,7 @@ export const launchBrowser = async () => {
     'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
   });
 
-  // await page.setBypassCSP(true);
+  await page.setBypassCSP(true);
 
   // Логування реклами без блокування Megogo API
   // page.on('requestfailed', req => {

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { NextResponse } from 'next/server';
 import path from 'path';
-
+//https://parser-m.onrender.com/api/getScreenShot
 export async function GET() {
   const screenshotPath = path.join('/tmp', 'screenshotFileName.png');
 

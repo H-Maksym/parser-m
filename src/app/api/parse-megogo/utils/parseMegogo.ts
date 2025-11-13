@@ -8,29 +8,31 @@ const isRemote =
   !!process.env.IS_RENDER;
 
 export const launchBrowser = async () => {
-  const chromiumPack =
-    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
+  // const chromiumPack =
+  //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
-  const isDocker = !!process.env.IS_DOCKER;
+  // const isDocker = !!process.env.IS_DOCKER;
 
-  const urlChromium = isRemote
-    ? chromiumPack
-    : isDocker
-      ? '/usr/bin/chromium'
-      : null;
+  // const urlChromium = isRemote
+  //   ? chromiumPack
+  //   : isDocker
+  //     ? '/usr/bin/chromium'
+  //     : null;
 
   let browser;
 
   if (isRemote) {
     browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       args: [
         ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
+        '--ignore-certificate-errors',
         '--disable-blink-features=AutomationControlled',
       ],
-      executablePath: await chromium.executablePath(urlChromium ?? undefined),
+      executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
+      // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
     });
   } else {
@@ -80,34 +82,34 @@ export async function parseMegogo(url: string) {
   const { browser, page } = await launchBrowser();
 
   // Блокуємо аналітику, рекламу, трекери
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    const url = req.url();
-    const blockedResources = [''];
-    // [
-    //   'google-analytics.com',
-    //   'bluekai.com',
-    //   'mgid.com',
-    //   'admixer.net',
-    //   'megogo.net/v5/tracker',
-    //   'adtcdn.com',
-    //   'googletagservices.com',
-    //   'doubleclick.net',
-    //   'googletagmanager.com',
-    //   'gstatic.com/prebid',
-    // ];
-    if (blockedResources.some(domain => url.includes(domain))) {
-      // console.log('⛔ Blocked:', url);
-      req.abort();
-    } else {
-      req.continue();
-    }
-  });
+  // await page.setRequestInterception(true);
+  // page.on('request', req => {
+  //   const url = req.url();
+  //   const blockedResources =
+  //   [
+  //     'google-analytics.com',
+  //     'bluekai.com',
+  //     'mgid.com',
+  //     'admixer.net',
+  //     'megogo.net/v5/tracker',
+  //     'adtcdn.com',
+  //     'googletagservices.com',
+  //     'doubleclick.net',
+  //     'googletagmanager.com',
+  //     'gstatic.com/prebid',
+  //   ];
+  //   if (blockedResources.some(domain => url.includes(domain))) {
+  //     // console.log('⛔ Blocked:', url);
+  //     req.abort();
+  //   } else {
+  //     req.continue();
+  //   }
+  // });
 
   // Встановлюємо User-Agent
   await page.setUserAgent({
     userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
   });
 
   // Логування помилок
@@ -118,8 +120,12 @@ export async function parseMegogo(url: string) {
 
   // Завантажуємо сторінку
   // завантаження з повним очікуванням
+  // const response = await page.goto(url, {
+  //   waitUntil: 'domcontentloaded',
+  // });
   const response = await page.goto(url, {
-    waitUntil: 'domcontentloaded',
+    waitUntil: 'networkidle2',
+    timeout: 60000,
   });
 
   //Прочитати кукіси

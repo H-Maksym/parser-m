@@ -140,37 +140,44 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const text = 'Принять все';
-  const elementsHTML = await page.evaluate(text => {
-    return Array.from(document.querySelectorAll('*'))
-      .filter(
-        e =>
-          e.textContent.toLowerCase() &&
-          e.textContent.includes(text.toLowerCase()),
-      )
-      .map(e => {
-        console.log('🚀 ~ parseMegogo ~ e:', e);
-        return e.outerHTML;
-      });
-  }, text);
+  // const elementsHTML = await page.evaluate(text => {
+  //   return Array.from(document.querySelectorAll('*'))
+  //     .filter(
+  //       e =>
+  //         e.textContent.toLowerCase() &&
+  //         e.textContent.includes(text.toLowerCase()),
+  //     )
+  //     .map(e => {
+  //       console.log('🚀 ~ parseMegogo ~ e:', e);
+  //       return e.outerHTML;
+  //     });
+  // }, text);
 
-  console.log('-----Кукіси-----', elementsHTML);
+  // console.log('-----Кукіси-----', elementsHTML);
+  const searchText = 'Принять все';
+  const searchText2 = 'Принять только';
 
-  const text2 = 'Принять только';
-  const elementsHTML2 = await page.evaluate(text => {
-    return Array.from(document.querySelectorAll('*'))
-      .filter(
-        e =>
-          e.textContent.toLowerCase() &&
-          e.textContent.includes(text.toLowerCase()),
-      )
-      .map(e => {
-        console.log('🚀 ~ parseMegogo ~ e:', e);
-        return e.outerHTML;
-      });
-  }, text2);
+  const elements = await page.$$('button, a, p, div, h1, h2, h3 ');
 
-  console.log('-----Кукіси--2---', elementsHTML2);
+  for (const el of elements) {
+    const text = await page.evaluate(
+      el => el.textContent.trim().toLowerCase(),
+      el,
+    );
+    if (text.includes(searchText.trim().toLowerCase())) {
+      // 🔍 тут умова пошуку по контенту
+      const includesHtml = await page.evaluate(el => el.outerHTML, el);
+      console.log('=== MATCH ===');
+      console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml);
+    }
+
+    if (text.includes(searchText2.trim().toLowerCase())) {
+      // 🔍 тут умова пошуку по контенту
+      const includesHtml2 = await page.evaluate(el => el.outerHTML, el);
+      console.log('=== MATCH ===');
+      console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml2);
+    }
+  }
 
   // Чекаємо поки кнопка з'явиться в DOM
   //   await page.waitForSelector(

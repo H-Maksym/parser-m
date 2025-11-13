@@ -123,6 +123,7 @@ export async function parseMegogo(url: string) {
   // завантаження з повним очікуванням
   const response = await page.goto(url, {
     waitUntil: 'domcontentloaded',
+    timeout: 50000,
   });
   // const response = await page.goto(url, {
   //    waitUntil: 'networkidle2',

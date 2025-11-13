@@ -40,7 +40,7 @@ export const launchBrowser = async () => {
     browser = await puppeteerLocal.default.launch({
       headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      defaultViewport: { width: 1366, height: 768 },
+      defaultViewport: { width: 1920, height: 980 },
     });
   }
 
@@ -137,7 +137,9 @@ export async function parseMegogo(url: string) {
   //     { timeout: 5000 },
   //   );
 
-  // const divs = await page.$$eval('div', els =>
+  const modal = await page.$$('div.modal');
+  console.log('🚀 ~ parseMegogo ~ modal:', modal);
+  // const divs = await page.$$eval('div.modal', els =>
   //   els.map(el => ({
   //     text: el.innerText.trim(),
   //     class: el.className,
@@ -146,8 +148,8 @@ export async function parseMegogo(url: string) {
   // );
   // console.log('🚀 ~ parseMegogo ~ divs:', divs);
 
-  const html = await page.content();
-  console.log('🚀 ~ parseMegogo ~ html:', html);
+  // const html = await page.content();
+  // console.log('🚀 ~ parseMegogo ~ html:', html);
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(

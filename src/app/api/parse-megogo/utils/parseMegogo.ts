@@ -70,6 +70,7 @@ export const launchBrowser = async () => {
 
   await page.setBypassCSP(true);
   // Логування помилок
+
   page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
 
   // page.on('requestfailed', req =>

@@ -137,14 +137,17 @@ export async function parseMegogo(url: string) {
   //     { timeout: 5000 },
   //   );
 
-  const divs = await page.$$eval('div', els =>
-    els.map(el => ({
-      text: el.innerText.trim(),
-      class: el.className,
-      // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-    })),
-  );
-  console.log('🚀 ~ parseMegogo ~ divs:', divs);
+  // const divs = await page.$$eval('div', els =>
+  //   els.map(el => ({
+  //     text: el.innerText.trim(),
+  //     class: el.className,
+  //     // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
+  //   })),
+  // );
+  // console.log('🚀 ~ parseMegogo ~ divs:', divs);
+
+  const html = await page.content();
+  console.log('🚀 ~ parseMegogo ~ html:', html);
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(

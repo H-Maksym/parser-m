@@ -185,15 +185,33 @@ export async function parseMegogo(url: string) {
   //     { timeout: 5000 },
   //   );
 
+  // Знайти div з текстом "Подтверждаю"
+  const button = await page.waitForFunction(
+    () => {
+      return (
+        Array.from(document.querySelectorAll('div')).find(el =>
+          el.textContent?.includes('Прийняти'),
+        ) || null
+      );
+    },
+    { timeout: 5000 },
+  );
+
+  if (button) {
+    const html = await page.evaluate(el => el?.outerHTML, button);
+    console.log('HTML елемента:\n', html);
+  } else {
+    console.log('Елемент не знайдено');
+  }
+
   //Вивести всі кнопки
-  // const buttons = await page.$$eval('button', els =>
+  // const buttons = await page.$$eval('div', els =>
   //   els.map(el => ({
   //     text: el.innerText.trim(),
   //     class: el.className,
   //     attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
   //   })),
   // );
-  // console.log('🚀 ~ parseMegogo ~ buttons:', buttons);
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(

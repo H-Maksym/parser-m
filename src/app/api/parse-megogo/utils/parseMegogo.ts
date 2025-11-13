@@ -140,6 +140,9 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
+  const html = await page.content();
+  console.log('---------  html  ---------', html);
+
   // Чекаємо поки кнопка з'явиться в DOM
   //   await page.waitForSelector(
   //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',

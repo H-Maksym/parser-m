@@ -137,8 +137,9 @@ export async function parseMegogo(url: string) {
   //     { timeout: 5000 },
   //   );
 
-  const modal = await page.$$('div.modal');
-  console.log('🚀 ~ parseMegogo ~ modal:', modal);
+  await page.waitForSelector('div.modal', { visible: true, timeout: 60000 });
+  const modals = await page.$$('div.modal');
+  console.log('🚀 ~ parseMegogo ~ modal:', modals);
   // const divs = await page.$$eval('div.modal', els =>
   //   els.map(el => ({
   //     text: el.innerText.trim(),

@@ -129,9 +129,8 @@ export async function parseMegogo(url: string) {
 
   // Прочитати кукіси
 
-  const cookies = await browser.cookies();
-
-  console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
+  // const cookies = await browser.cookies();
+  // console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 
   // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;

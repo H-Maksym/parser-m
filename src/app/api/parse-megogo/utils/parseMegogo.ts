@@ -48,6 +48,7 @@ export const launchBrowser = async () => {
 
   const page = await browser.newPage();
 
+  // Встановлюємо User-Agent
   await page.setUserAgent({
     userAgent:
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
@@ -68,6 +69,12 @@ export const launchBrowser = async () => {
   });
 
   await page.setBypassCSP(true);
+  // Логування помилок
+  page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
+
+  // page.on('requestfailed', req =>
+  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
+  // );
 
   // Логування реклами без блокування Megogo API
   // page.on('requestfailed', req => {
@@ -107,18 +114,6 @@ export async function parseMegogo(url: string) {
   //   }
   // });
 
-  // Встановлюємо User-Agent
-  await page.setUserAgent({
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  });
-
-  // Логування помилок
-  page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
-  // page.on('requestfailed', req =>
-  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
-  // );
-
   // Завантажуємо сторінку з повним очікуванням
   const response = await page.goto(url, {
     waitUntil: 'networkidle2',
@@ -137,8 +132,11 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const pageContents = await page.content();
-  console.log('🚀 ~ parseMegogo ~ pageContents:', pageContents);
+  // const pageContents = await page.content();
+  // console.log('🚀 ~ parseMegogo ~ pageContents:', pageContents);
+
+  // const pageFrames = await page.frames();
+  // console.log('🚀 ~ parseMegogo ~ pageFrames:', pageFrames);
 
   // const searchText = 'Принять все';
   // const searchText2 = 'Принять только';
@@ -178,12 +176,12 @@ export async function parseMegogo(url: string) {
 
   // Знайти div з текстом "Подтверждаю"
 
-  const button = await page.$eval('div.consent-content', el => el.innerText);
-  if (button) {
-    console.log('HTML елемента:\n', button);
-  } else {
-    console.log('Елемент не знайдено');
-  }
+  // const button = await page.$eval('div.consent-content', el => el.outerHTML);
+  // if (button) {
+  //   console.log('HTML елемента:\n', button);
+  // } else {
+  //   console.log('Елемент не знайдено');
+  // }
 
   // const button = await page.waitForFunction(
   //   () => {
@@ -206,6 +204,14 @@ export async function parseMegogo(url: string) {
   //     attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
   //   })),
   // );
+
+  const btnCookies = await page.evaluate(() => {
+    const btn = Array.from(document.querySelectorAll('*')).find(
+      e => e.textContent.trim() === 'Прийняти',
+    );
+    return btn ? btn.classList : null;
+  });
+  console.log('🚀 ~ parseMegogo ~ btnCookies:', btnCookies);
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(

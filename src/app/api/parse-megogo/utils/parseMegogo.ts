@@ -117,7 +117,7 @@ export async function parseMegogo(url: string) {
 
   // Завантажуємо сторінку з повним очікуванням
   const response = await page.goto(url, {
-    waitUntil: 'networkidle2',
+    waitUntil: 'networkidle0',
     timeout: 60000,
   });
 

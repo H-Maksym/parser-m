@@ -205,13 +205,13 @@ export async function parseMegogo(url: string) {
   //   })),
   // );
 
-  const btnCookies = await page.evaluate(() => {
-    const btn = Array.from(document.querySelectorAll('*')).find(
-      e => e.textContent.trim() === 'Прийняти',
-    );
-    return btn ? btn.classList : null;
-  });
-  console.log('🚀 ~ parseMegogo ~ btnCookies:', btnCookies);
+  // const btnCookies = await page.evaluate(() => {
+  //   const btn = Array.from(document.querySelectorAll('*')).find(
+  //     e => e.textContent.trim() === 'Прийняти',
+  //   );
+  //   return btn ? btn.classList : null;
+  // });
+  // console.log('🚀 ~ parseMegogo ~ btnCookies:', btnCookies);
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(

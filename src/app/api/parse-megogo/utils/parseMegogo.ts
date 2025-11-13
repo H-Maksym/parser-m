@@ -3,9 +3,9 @@ import puppeteer from 'puppeteer-core';
 
 const isRemote =
   !!process.env.AWS_REGION ||
-  !!process.env.IS_VERCEL ||
   !!process.env.IS_DOCKER ||
   !!process.env.IS_RENDER;
+// !!process.env.IS_VERCEL ||
 
 export const launchBrowser = async () => {
   const chromiumPack =

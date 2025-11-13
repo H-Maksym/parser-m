@@ -112,7 +112,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 EXPOSE 3000
 
 # 15. Запускаємо сервер Next.js у production режимі
-CMD ["pnpm", "start"]
+CMD ["pnpm","start"]
 
 
 

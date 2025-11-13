@@ -1,5 +1,3 @@
-// https://megogo.net/ua/view/2435691-kozaki-futbol.html
-
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
@@ -48,7 +46,6 @@ export const launchBrowser = async () => {
 
   const page = await browser.newPage();
 
-  // Встановлюємо User-Agent
   await page.setUserAgent({
     userAgent:
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
@@ -69,13 +66,6 @@ export const launchBrowser = async () => {
   });
 
   await page.setBypassCSP(true);
-  // Логування помилок
-
-  page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
-
-  // page.on('requestfailed', req =>
-  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
-  // );
 
   // Логування реклами без блокування Megogo API
   // page.on('requestfailed', req => {
@@ -115,13 +105,30 @@ export async function parseMegogo(url: string) {
   //   }
   // });
 
-  // Завантажуємо сторінку з повним очікуванням
+  // Встановлюємо User-Agent
+  await page.setUserAgent({
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  });
+
+  // Логування помилок
+  page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
+  // page.on('requestfailed', req =>
+  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
+  // );
+
+  // Завантажуємо сторінку
+  // завантаження з повним очікуванням
+  // const response = await page.goto(url, {
+  //   waitUntil: 'domcontentloaded',
+  // });
   const response = await page.goto(url, {
-    waitUntil: 'networkidle0',
+    waitUntil: 'networkidle2',
     timeout: 60000,
   });
 
   // Прочитати кукіси
+
   // const cookies = await browser.cookies();
   // console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 
@@ -133,21 +140,24 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // const pageContents = await page.content();
-  // console.log('🚀 ~ parseMegogo ~ pageContents:', pageContents);
+  // const elementsHTML = await page.evaluate(text => {
+  //   return Array.from(document.querySelectorAll('*'))
+  //     .filter(
+  //       e =>
+  //         e.textContent.toLowerCase() &&
+  //         e.textContent.includes(text.toLowerCase()),
+  //     )
+  //     .map(e => {
+  //       console.log('🚀 ~ parseMegogo ~ e:', e);
+  //       return e.outerHTML;
+  //     });
+  // }, text);
 
-  // const pageFrames = await page.frames();
-  // console.log('🚀 ~ parseMegogo ~ pageFrames:', pageFrames);
-
+  // console.log('-----Кукіси-----', elementsHTML);
   // const searchText = 'Принять все';
   // const searchText2 = 'Принять только';
 
-  // Знайти елементи
-  // const elements = await page.waitForSelector('button, a, p, div, h1, h2, h3', {
-  //   visible: true,
-  //   hidden: true,
-  //   timeout: 5000,
-  // });
+  // const elements = await page.$$('button, a, p, div, h1, h2, h3 ');
 
   // for (const el of elements) {
   //   const text = await page.evaluate(
@@ -170,49 +180,19 @@ export async function parseMegogo(url: string) {
   // }
 
   // Чекаємо поки кнопка з'явиться в DOM
-  // await page.waitForSelector(
-  //   '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-  //   { timeout: 5000 },
-  // );
-
-  // Знайти div з текстом "Подтверждаю"
-
-  // const button = await page.$eval('div.consent-content', el => el.outerHTML);
-  // if (button) {
-  //   console.log('HTML елемента:\n', button);
-  // } else {
-  //   console.log('Елемент не знайдено');
-  // }
-
-  // const button = await page.waitForFunction(
-  //   () => {
-  //     return (
-  //       Array.from(document.querySelectorAll('div')).find(
-  //         el =>
-  //           el.textContent?.includes('Прийняти') ||
-  //           el.textContent?.includes('Підтверджую'),
-  //       ) || null
-  //     );
-  //   },
-  //   { timeout: 5000 },
-  // );
-
-  //Вивести всі кнопки
-  // const buttons = await page.$$eval('div', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-  //   })),
-  // );
-
-  // const btnCookies = await page.evaluate(() => {
-  //   const btn = Array.from(document.querySelectorAll('*')).find(
-  //     e => e.textContent.trim() === 'Прийняти',
+  //   await page.waitForSelector(
+  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+  //     { timeout: 5000 },
   //   );
-  //   return btn ? btn.classList : null;
-  // });
-  // console.log('🚀 ~ parseMegogo ~ btnCookies:', btnCookies);
+
+  const buttons = await page.$$eval('button', els =>
+    els.map(el => ({
+      text: el.innerText.trim(),
+      class: el.className,
+      attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
+    })),
+  );
+  console.log('🚀 ~ parseMegogo ~ buttons:', buttons);
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(
@@ -245,23 +225,6 @@ export async function parseMegogo(url: string) {
 
   // почекати вручну, якщо треба
   await new Promise(resolve => setTimeout(resolve, 5000));
-
-  // const mainSectionHtml = await page.evaluate(() => {
-  //   const main = document.querySelector(
-  //     'main section.widget.videoView_v2.product-main div.videoView-episodes',
-  //   );
-  //   return main ? main.innerHTML : null;
-  // });
-  // console.log('🧾 Main element content:', mainSectionHtml);
-
-  // чекати, поки серії завантажаться
-  // await page.waitForFunction(
-  //   () => {
-  //     const list = document.querySelector('ul.seasons-list');
-  //     return list && list.children.length > 0;
-  //   },
-  //   { timeout: 20000 },
-  // );
 
   await page.waitForSelector('ul.seasons-list');
 
@@ -332,11 +295,5 @@ export async function parseMegogo(url: string) {
 
   await browser.close();
 
-  // // 📥 Зчитуємо скріншот у base64
-  // const screenshotBase64 = await readFile(screenshotPath, {
-  //   encoding: 'base64',
-  // });
-
-  // return { screenshotPath, screenshotBase64, pageTitle, results };
   return { pageTitle, results };
 }

@@ -115,20 +115,15 @@ export async function parseMegogo(url: string) {
 
   // Логування помилок
   page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
-  // page.on('requestfailed', req =>
-  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
-  // );
+  page.on('requestfailed', req =>
+    console.error('⚠️ Request failed:', req.url(), req.failure()),
+  );
 
-  // Завантажуємо сторінку
-  // завантаження з повним очікуванням
+  // Завантажуємо сторінку з повним очікуванням
   const response = await page.goto(url, {
-    waitUntil: 'domcontentloaded',
-    timeout: 50000,
+    waitUntil: 'networkidle2',
+    timeout: 60000,
   });
-  // const response = await page.goto(url, {
-  //    waitUntil: 'networkidle2',
-  //    timeout: 60000,
-  // });
 
   // Прочитати кукіси
 
@@ -142,19 +137,6 @@ export async function parseMegogo(url: string) {
     : `public/${screenshotFileName}`;
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
-
-  // const elementsHTML = await page.evaluate(text => {
-  //   return Array.from(document.querySelectorAll('*'))
-  //     .filter(
-  //       e =>
-  //         e.textContent.toLowerCase() &&
-  //         e.textContent.includes(text.toLowerCase()),
-  //     )
-  //     .map(e => {
-  //       console.log('🚀 ~ parseMegogo ~ e:', e);
-  //       return e.outerHTML;
-  //     });
-  // }, text);
 
   // console.log('-----Кукіси-----', elementsHTML);
   // const searchText = 'Принять все';

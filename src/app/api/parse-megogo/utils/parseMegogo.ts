@@ -42,7 +42,7 @@ export const launchBrowser = async () => {
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({
-      headless: true,
+      headless: false,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -136,14 +136,14 @@ export async function parseMegogo(url: string) {
   });
 
   // 🖼️ Зберігаємо скріншот у /tmp
-  const screenshotFileName = `screenshotFileName.png`;
-  const screenshotPath = isRemote
-    ? `/tmp/${screenshotFileName}`
-    : `public/${screenshotFileName}`;
+  // const screenshotFileName = `screenshotFileName.png`;
+  // const screenshotPath = isRemote
+  //   ? `/tmp/${screenshotFileName}`
+  //   : `public/${screenshotFileName}`;
 
-  await page.screenshot({ path: screenshotPath, fullPage: true });
+  // await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const modal = await page.$$eval('div.modal', els =>
+  const modal = await page.$$eval('div[class*="consent"]', els =>
     els.map(el => ({
       text: el.innerText.trim(),
       class: el.className,
@@ -151,6 +151,15 @@ export async function parseMegogo(url: string) {
     })),
   ); // повертає ElementHandle або null
   console.log('🚀 ~ parseMegogo ~ modal:', modal);
+
+  const popUP = await page.$$eval('div[class*="jsPopup"]', els =>
+    els.map(el => ({
+      text: el.innerText.trim(),
+      class: el.className,
+      html: el.outerHTML,
+    })),
+  ); // повертає ElementHandle або null
+  console.log('🚀 ~ parseMegogo ~ modal:', popUP);
 
   // const bodyHTML = await page.$eval('body', el => el.innerText);
   // console.log('🚀 ~ parseMegogo ~ bodyHTML:', bodyHTML);

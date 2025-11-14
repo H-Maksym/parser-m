@@ -3,9 +3,9 @@ import puppeteer from 'puppeteer-core';
 
 const isRemote =
   !!process.env.AWS_REGION ||
+  !!process.env.VERCEL ||
   !!process.env.IS_DOCKER ||
   !!process.env.IS_RENDER;
-// !!process.env.IS_VERCEL ||
 
 export const launchBrowser = async () => {
   // const chromiumPack =
@@ -35,20 +35,12 @@ export const launchBrowser = async () => {
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
     });
-  } else if (!!process.env.IS_VERCEL) {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [...chromium.args, '--disable-extensions'],
-      executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
-      // executablePath: await chromium.executablePath(urlChromium ?? undefined),
-      defaultViewport: { width: 1366, height: 768 },
-    });
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({
       headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      defaultViewport: { width: 1920, height: 980 },
+      defaultViewport: { width: 1366, height: 768 },
     });
   }
 
@@ -87,8 +79,6 @@ export const launchBrowser = async () => {
 };
 
 export async function parseMegogo(url: string) {
-  console.log('🚀 ~ parseMegogo ~ parseMegogo running');
-
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
   // await page.setRequestInterception(true);
@@ -141,40 +131,8 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // await page.locator('body').scroll({
-  //   scrollLeft: 10,
-  //   scrollTop: 20,
-  // });
-
-  // try {
-  //   const pdfFileName = `pdfFileName.pdf`;
-  //   const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;
-  //   await page.pdf({
-  //     path: pdfPath,
-  //   });
-  // } catch (error) {
-  //   console.log('error in try-catch', error);
-  // }
-
-  // Чекаємо поки кнопка з'явиться в DOM
-  //   await page.waitForSelector(
-  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-  //     { timeout: 5000 },
-  //   );
-
-  // const modals = await page.$$('div.modal');
-  // console.log('🚀 ~ parseMegogo ~ modal:', modals);
-  // const divs = await page.$$eval('div.modal', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-  //   })),
-  // );
-  // console.log('🚀 ~ parseMegogo ~ divs:', divs);
-
-  // const html = await page.content();
-  // console.log('🚀 ~ parseMegogo ~ html:', html);
+  const html = await page.content();
+  console.log('🚀 ~ parseMegogo ~ html:', html);
 
   const btnAge = await page.evaluate(() => {
     const btn = document.querySelector(

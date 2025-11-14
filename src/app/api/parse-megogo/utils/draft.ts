@@ -62,47 +62,37 @@
 //   }
 // }
 
-// Чекаємо поки кнопка з'явиться в DOM
-// await page.waitForSelector(
-//   '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-//   { timeout: 5000 },
-// );
+// await page.locator('body').scroll({
+//   scrollLeft: 10,
+//   scrollTop: 20,
+// });
 
-// Знайти div з текстом "Подтверждаю"
-
-// const button = await page.$eval('div.consent-content', el => el.outerHTML);
-// if (button) {
-//   console.log('HTML елемента:\n', button);
-// } else {
-//   console.log('Елемент не знайдено');
+// try {
+//   const pdfFileName = `pdfFileName.pdf`;
+//   const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;
+//   await page.pdf({
+//     path: pdfPath,
+//   });
+// } catch (error) {
+//   console.log('error in try-catch', error);
 // }
 
-// const button = await page.waitForFunction(
-//   () => {
-//     return (
-//       Array.from(document.querySelectorAll('div')).find(
-//         el =>
-//           el.textContent?.includes('Прийняти') ||
-//           el.textContent?.includes('Підтверджую'),
-//       ) || null
-//     );
-//   },
-//   { timeout: 5000 },
-// );
+// Чекаємо поки кнопка з'явиться в DOM
+//   await page.waitForSelector(
+//     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+//     { timeout: 5000 },
+//   );
 
-//Вивести всі кнопки
-// const buttons = await page.$$eval('div', els =>
+// const modals = await page.$$('div.modal');
+// console.log('🚀 ~ parseMegogo ~ modal:', modals);
+// const divs = await page.$$eval('div.modal', els =>
 //   els.map(el => ({
 //     text: el.innerText.trim(),
 //     class: el.className,
-//     attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
+//     // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
 //   })),
 // );
+// console.log('🚀 ~ parseMegogo ~ divs:', divs);
 
-// const btnCookies = await page.evaluate(() => {
-//   const btn = Array.from(document.querySelectorAll('*')).find(
-//     e => e.textContent.trim() === 'Прийняти',
-//   );
-//   return btn ? btn.classList : null;
-// });
-// console.log('🚀 ~ parseMegogo ~ btnCookies:', btnCookies);
+// const html = await page.content();
+// console.log('🚀 ~ parseMegogo ~ html:', html);

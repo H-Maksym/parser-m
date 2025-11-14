@@ -131,16 +131,13 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const html = await page.content();
-  console.log('🚀 ~ parseMegogo ~ html:', html);
-
-  const btnAge = await page.evaluate(() => {
-    const btn = document.querySelector(
-      '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-    );
-    return btn ? btn.innerHTML : null;
-  });
-  console.log('🎬 btnAge:', btnAge);
+  // const btnAge = await page.evaluate(() => {
+  //   const btn = document.querySelector(
+  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+  //   );
+  //   return btn ? btn.innerHTML : null;
+  // });
+  // console.log('🎬 btnAge:', btnAge);
 
   await new Promise(resolve => setTimeout(resolve, 5000));
 

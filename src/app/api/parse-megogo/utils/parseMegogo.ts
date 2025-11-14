@@ -179,8 +179,8 @@ export async function parseMegogo(url: string) {
   // );
 
   // console.log('🚀 ~ parseMegogo ~ modal:', modals);
-  const bodyHTML = await page.locator('body');
-  console.log('🚀 ~ parseMeggo ~ html:', bodyHTML);
+  // const bodyHTML = await page.locator('body');
+  // console.log('🚀 ~ parseMeggo ~ html:', bodyHTML);
 
   // const divs = await page.$$eval('button', els =>
   //   els.map(el => ({

@@ -128,27 +128,26 @@
 
 
 # 1. Базовий образ, що має Chrome + потрібні залежності  
-FROM ghcr.io/puppeteer/puppeteer:latest  
+FROM ghcr.io/puppeteer/puppeteer:latest
 
-# 2. Встановлюємо робочу директорію  
-WORKDIR /app  
+WORKDIR /app
 
+# Встановлюємо pnpm глобально (надійніше ніж corepack)
 RUN npm install -g pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# 3. Копіюємо package-файли і встановлюємо залежності  
-COPY package*.json ./ 
-RUN pnpm install  
+# Копіюємо lock-файли
+COPY package.json pnpm-lock.yaml ./
 
-# 4. Копіюємо весь код  
-COPY . .  
+# Інсталяція залежностей
+RUN pnpm install --frozen-lockfile
 
-# 5. Збірка Next.js проєкту  
-RUN pnpm run build  
+# Копіюємо весь код
+COPY . .
 
-# 6. Вказуємо порт, який слухатиме Next.js  
-EXPOSE 3000  
+# Збірка Next.js
+RUN pnpm run build
 
-# 7. Запуск серверу  
-CMD ["npm", "start"]
+EXPOSE 3000
+
+CMD ["pnpm", "start"]
 

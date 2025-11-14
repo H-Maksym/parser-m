@@ -198,9 +198,9 @@ export async function parseMegogo(url: string) {
   console.log('🚀 ~ parseMegogo ~ divs:', divs);
 
   // //  Клікаємо по кнопці
-  // await page.click(
-  //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  // );
+  await page.click(
+    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  );
 
   if (!response || !response.ok()) {
     console.error(

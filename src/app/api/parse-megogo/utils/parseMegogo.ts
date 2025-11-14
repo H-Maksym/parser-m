@@ -148,6 +148,7 @@ export async function parseMegogo(url: string) {
     waitUntil: 'networkidle2',
     timeout: 60000,
   });
+  console.log('🚀 ~ parseMegogo ~ response:', response);
 
   // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;
@@ -285,5 +286,5 @@ export async function parseMegogo(url: string) {
 
   await browser.close();
 
-  return { pageTitle: '', results: '' };
+  return { pageTitle: '', results: [] };
 }

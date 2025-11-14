@@ -33,7 +33,7 @@ export const launchBrowser = async () => {
       ],
       executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
-      defaultViewport: { width: 1920, height: 980 },
+      defaultViewport: { width: 1366, height: 768 },
     });
   } else if (!!process.env.IS_VERCEL) {
     browser = await puppeteer.launch({
@@ -87,6 +87,8 @@ export const launchBrowser = async () => {
 };
 
 export async function parseMegogo(url: string) {
+  console.log('🚀 ~ parseMegogo ~ parseMegogo running');
+
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
   // await page.setRequestInterception(true);
@@ -138,6 +140,11 @@ export async function parseMegogo(url: string) {
     : `public/${screenshotFileName}`;
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
+
+  // await page.locator('body').scroll({
+  //   scrollLeft: 10,
+  //   scrollTop: 20,
+  // });
 
   // try {
   //   const pdfFileName = `pdfFileName.pdf`;

@@ -11,7 +11,7 @@
 #         value: 10000
 
 services:
-  - name: my-next-puppeteer-app
+  - name: parse-m
     dockerfilePath: ./Dockerfile
     env:
       NODE_ENV: production

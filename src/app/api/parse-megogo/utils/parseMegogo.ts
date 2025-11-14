@@ -8,8 +8,8 @@ const isRemote =
 // !!process.env.IS_VERCEL ||
 
 export const launchBrowser = async () => {
-  const chromiumPack =
-    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
+  // const chromiumPack =
+  //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
   // const isDocker = !!process.env.IS_DOCKER;
 
@@ -33,13 +33,13 @@ export const launchBrowser = async () => {
       ],
       executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
-      defaultViewport: { width: 1366, height: 768 },
+      defaultViewport: { width: 1920, height: 980 },
     });
   } else if (!!process.env.IS_VERCEL) {
     browser = await puppeteer.launch({
       headless: true,
       args: [...chromium.args, '--disable-extensions'],
-      executablePath: await chromium.executablePath(chromiumPack), // Sparticuz автоматично підбирає шлях
+      executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
     });
@@ -139,7 +139,6 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  await page.evaluate(() => window.scrollBy(400, document.body.scrollHeight));
   // try {
   //   const pdfFileName = `pdfFileName.pdf`;
   //   const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;

@@ -51,29 +51,30 @@ export const launchBrowser = async () => {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
   });
 
-  // await page.evaluateOnNewDocument(() => {
-  //   Object.defineProperty(navigator, 'webdriver', { get: () => false });
-  //   // @ts-expect-error mock chrome.runtime for tests
-  //   window.chrome = { runtime: {} };
-  //   Object.defineProperty(navigator, 'languages', {
-  //     get: () => ['uk-UA', 'uk'],
-  //   });
-  //   Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
-  // });
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    // @ts-expect-error mock chrome.runtime for tests
+    window.chrome = { runtime: {} };
+    Object.defineProperty(navigator, 'languages', {
+      get: () => ['uk-UA', 'uk'],
+    });
+    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
+    console.log('page.evaluateOnNewDocument');
+  });
 
-  // await page.setExtraHTTPHeaders({
-  //   'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
-  // });
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
+  });
 
   await page.setBypassCSP(true);
 
   // Логування реклами без блокування Megogo API
-  page.on('requestfailed', req => {
-    const url = req.url();
-    if (url.includes('ads.') || url.includes('doubleclick')) {
-      console.log('❌ Blocked ad:', url);
-    }
-  });
+  // page.on('requestfailed', req => {
+  //   const url = req.url();
+  //   if (url.includes('ads.') || url.includes('doubleclick')) {
+  //     console.log('❌ Blocked ad:', url);
+  //   }
+  // });
 
   return { browser, page };
 };
@@ -137,99 +138,99 @@ export async function parseMegogo(url: string) {
 
   // await new Promise(resolve => setTimeout(resolve, 5000));
 
-  //  Клікаємо по кнопці погодження віку
-  await page.click(
-    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  );
+  // //  Клікаємо по кнопці погодження віку
+  // await page.click(
+  //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  // );
 
-  if (!response || !response.ok()) {
-    console.error(
-      'Failed to load the page:',
-      response ? response.status() : 'No response',
-    );
-  }
-  console.log('✅ Page loaded with status:', response?.status());
+  // if (!response || !response.ok()) {
+  //   console.error(
+  //     'Failed to load the page:',
+  //     response ? response.status() : 'No response',
+  //   );
+  // }
+  // console.log('✅ Page loaded with status:', response?.status());
 
-  const pageTitleSelector = await page
-    .locator('h1.video-title[itemprop="name"]')
-    .waitHandle();
-  const pageTitle = await pageTitleSelector?.evaluate(el =>
-    el.textContent.trim(),
-  );
-  console.log('🎬 Title:', pageTitle);
+  // const pageTitleSelector = await page
+  //   .locator('h1.video-title[itemprop="name"]')
+  //   .waitHandle();
+  // const pageTitle = await pageTitleSelector?.evaluate(el =>
+  //   el.textContent.trim(),
+  // );
+  // console.log('🎬 Title:', pageTitle);
 
-  // почекати вручну, якщо треба
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  // // почекати вручну, якщо треба
+  // await new Promise(resolve => setTimeout(resolve, 5000));
 
-  await page.waitForSelector('ul.seasons-list');
+  // await page.waitForSelector('ul.seasons-list');
 
-  const seasons = await page.$$eval('ul.seasons-list li a', links =>
-    links.map(a => ({
-      title: a.textContent?.trim() ?? '',
-      href: (a as HTMLAnchorElement).href,
-      dataId: a.getAttribute('data-season')
-        ? JSON.parse(a.getAttribute('data-season')!).id
-        : '',
-    })),
-  );
+  // const seasons = await page.$$eval('ul.seasons-list li a', links =>
+  //   links.map(a => ({
+  //     title: a.textContent?.trim() ?? '',
+  //     href: (a as HTMLAnchorElement).href,
+  //     dataId: a.getAttribute('data-season')
+  //       ? JSON.parse(a.getAttribute('data-season')!).id
+  //       : '',
+  //   })),
+  // );
 
-  const results: Record<string, Array<{ title: string; url: string }>> = {};
+  // const results: Record<string, Array<{ title: string; url: string }>> = {};
 
-  for (const season of seasons) {
-    await page.goto(season.href, { waitUntil: 'domcontentloaded' });
+  // for (const season of seasons) {
+  //   await page.goto(season.href, { waitUntil: 'domcontentloaded' });
 
-    await page.waitForSelector(
-      `.season-container[data-season-id="${season.dataId}"].is-loaded .cards-list`,
-    );
+  //   await page.waitForSelector(
+  //     `.season-container[data-season-id="${season.dataId}"].is-loaded .cards-list`,
+  //   );
 
-    const nextSelector = '.season-container a[data-mgg-action="next"]';
+  //   const nextSelector = '.season-container a[data-mgg-action="next"]';
 
-    while (true) {
-      const nextLink = await page.$(nextSelector);
-      if (!nextLink) break;
+  //   while (true) {
+  //     const nextLink = await page.$(nextSelector);
+  //     if (!nextLink) break;
 
-      await page.evaluate(el => {
-        el.dispatchEvent(
-          new MouseEvent('click', { bubbles: true, cancelable: true }),
-        );
-      }, nextLink);
+  //     await page.evaluate(el => {
+  //       el.dispatchEvent(
+  //         new MouseEvent('click', { bubbles: true, cancelable: true }),
+  //       );
+  //     }, nextLink);
 
-      await new Promise(r => setTimeout(r, 500));
+  //     await new Promise(r => setTimeout(r, 500));
 
-      const isDisabled = await nextLink.evaluate(
-        el =>
-          el.classList.contains('disabled') ||
-          el.getAttribute('aria-disabled') === 'true' ||
-          el.hasAttribute('disabled'),
-      );
-      if (isDisabled) break;
-    }
+  //     const isDisabled = await nextLink.evaluate(
+  //       el =>
+  //         el.classList.contains('disabled') ||
+  //         el.getAttribute('aria-disabled') === 'true' ||
+  //         el.hasAttribute('disabled'),
+  //     );
+  //     if (isDisabled) break;
+  //   }
 
-    const episodes = await page.$$eval(
-      `.season-container[data-season-id="${season.dataId}"].is-loaded .cards-list .card`,
-      cards =>
-        cards
-          .map(card => {
-            const title =
-              card.getAttribute('data-episode-title') ||
-              card
-                .querySelector('[data-episode-title]')
-                ?.getAttribute('data-episode-title') ||
-              '';
-            const href = card.querySelector('a')?.getAttribute('href') ?? '';
-            return {
-              title,
-              url: href ? new URL(href, window.location.origin).href : '',
-            };
-          })
-          .filter(e => e.title && e.url),
-    );
-    console.log('🚀 ~ parseMegogo ~ ended:');
+  //   const episodes = await page.$$eval(
+  //     `.season-container[data-season-id="${season.dataId}"].is-loaded .cards-list .card`,
+  //     cards =>
+  //       cards
+  //         .map(card => {
+  //           const title =
+  //             card.getAttribute('data-episode-title') ||
+  //             card
+  //               .querySelector('[data-episode-title]')
+  //               ?.getAttribute('data-episode-title') ||
+  //             '';
+  //           const href = card.querySelector('a')?.getAttribute('href') ?? '';
+  //           return {
+  //             title,
+  //             url: href ? new URL(href, window.location.origin).href : '',
+  //           };
+  //         })
+  //         .filter(e => e.title && e.url),
+  //   );
+  //   console.log('🚀 ~ parseMegogo ~ ended:');
 
-    results[season.title] = episodes;
-  }
+  //   results[season.title] = episodes;
+  // }
 
   await browser.close();
-
-  return { pageTitle, results };
+  return null;
+  // return { pageTitle, results };
 }

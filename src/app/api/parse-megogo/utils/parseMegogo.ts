@@ -24,6 +24,9 @@ export const launchBrowser = async () => {
   if (isRemote) {
     browser = await puppeteer.launch({
       headless: true,
+      //added last
+      protocolTimeout: 3_000,
+      protocol: 'cdp',
       args: [
         ...chromium.args,
         '--no-sandbox',
@@ -136,30 +139,39 @@ export async function parseMegogo(url: string) {
   });
 
   // 🖼️ Зберігаємо скріншот у /tmp
-  // const screenshotFileName = `screenshotFileName.png`;
-  // const screenshotPath = isRemote
-  //   ? `/tmp/${screenshotFileName}`
-  //   : `public/${screenshotFileName}`;
+  const screenshotFileName = `screenshotFileName.png`;
+  const screenshotPath = isRemote
+    ? `/tmp/${screenshotFileName}`
+    : `public/${screenshotFileName}`;
+  await page.bringToFront();
+  await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // await page.screenshot({ path: screenshotPath, fullPage: true });
-
-  const modal = await page.$$eval('div[class*="consent"]', els =>
+  const consent = await page.$$eval('div[class*="consent"]', els =>
     els.map(el => ({
       text: el.innerText.trim(),
       class: el.className,
       html: el.outerHTML,
     })),
   ); // повертає ElementHandle або null
-  console.log('🚀 ~ parseMegogo ~ modal:', modal);
+  console.log('🚀 ~ parseMegogo ~ consent:', consent);
 
-  const popUP = await page.$$eval('div[class*="jsPopup"]', els =>
+  const dialog = await page.$$eval('div[class*="dialog"]', els =>
     els.map(el => ({
       text: el.innerText.trim(),
       class: el.className,
       html: el.outerHTML,
     })),
   ); // повертає ElementHandle або null
-  console.log('🚀 ~ parseMegogo ~ modal:', popUP);
+  console.log('🚀 ~ parseMegogo ~ dialog:', dialog);
+
+  const btn = await page.$$eval('div[class*="btn"]', els =>
+    els.map(el => ({
+      text: el.innerText.trim(),
+      class: el.className,
+      html: el.outerHTML,
+    })),
+  ); // повертає ElementHandle або null
+  console.log('🚀 ~ parseMegogo ~ btn:', btn);
 
   // const bodyHTML = await page.$eval('body', el => el.innerText);
   // console.log('🚀 ~ parseMegogo ~ bodyHTML:', bodyHTML);

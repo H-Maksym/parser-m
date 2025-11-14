@@ -3,10 +3,9 @@ FROM node:22 AS builder
 
 ENV IS_DOCKER=true
 
-# Встановлюємо tar (щоб уникнути проблем з архівацією), wget і залежності для Chromium
+# Встановлюємо Chromium + необхідні бібліотеки
 RUN apt-get update && apt-get install -y \
-    tar \
-    wget \
+    chromium \
     ca-certificates \
     fonts-liberation \
     libatk1.0-0 \
@@ -26,9 +25,9 @@ RUN apt-get update && apt-get install -y \
     libnss3 \
     libxss1 \
     libxtst6 \
-    lsb-release \
     xdg-utils \
-    --no-install-recommends && rm -rf /var/lib/apt/lists/*
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
 # 2. Встановлюємо pnpm глобально
 # RUN npm install -g pnpm
@@ -66,8 +65,9 @@ FROM node:22 AS runner
 
 ENV IS_DOCKER=true
 
-# Встановлюємо tar і залежності для Chromium
+# Встановлюємо Chromium + необхідні бібліотеки
 RUN apt-get update && apt-get install -y \
+    chromium \
     ca-certificates \
     fonts-liberation \
     libatk1.0-0 \
@@ -88,7 +88,8 @@ RUN apt-get update && apt-get install -y \
     libxss1 \
     libxtst6 \
     xdg-utils \
-    --no-install-recommends && rm -rf /var/lib/apt/lists/*
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

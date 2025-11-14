@@ -10,15 +10,16 @@
     "parse:megogo": "tsx scripts/parse-megogo.ts"
   },
   "dependencies": {
-    "@sparticuz/chromium": "121.0.0",
-    "@sparticuz/chromium-min": "121.0.0",
+    "@sparticuz/chromium": "141.0.0",
+    "@sparticuz/chromium-min": "141.0.0",
     "add": "^2.0.6",
+    "browsers": "^1.0.2",
     "cheerio": "^1.1.2",
     "domhandler": "^5.0.3",
     "next": "15.5.3",
     "pnpm": "^10.17.0",
-    "puppeteer": "^24.29.1",
-    "puppeteer-core": "^24.29.1",
+    "puppeteer": "24.25.0",
+    "puppeteer-core": "24.25.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "xlsx": "^0.18.5"

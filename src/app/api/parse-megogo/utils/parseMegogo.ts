@@ -140,12 +140,12 @@ export async function parseMegogo(url: string) {
   });
 
   // // 🖼️ Зберігаємо скріншот у /tmp
-  // const screenshotFileName = `screenshotFileName.png`;
-  // const screenshotPath = isRemote
-  //   ? `/tmp/${screenshotFileName}`
-  //   : `public/${screenshotFileName}`;
-  // await page.bringToFront();
-  // await page.screenshot({ path: screenshotPath, fullPage: true });
+  const screenshotFileName = `screenshotFileName.png`;
+  const screenshotPath = isRemote
+    ? `/tmp/${screenshotFileName}`
+    : `public/${screenshotFileName}`;
+  await page.bringToFront();
+  await page.screenshot({ path: screenshotPath, fullPage: true });
 
   const consent = await page.$$eval('div[class*="consent"]', els =>
     els.map(el => ({

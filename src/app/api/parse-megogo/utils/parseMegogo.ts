@@ -51,29 +51,29 @@ export const launchBrowser = async () => {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
   });
 
-  await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-    // @ts-expect-error mock chrome.runtime for tests
-    window.chrome = { runtime: {} };
-    Object.defineProperty(navigator, 'languages', {
-      get: () => ['uk-UA', 'uk'],
-    });
-    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
-  });
+  // await page.evaluateOnNewDocument(() => {
+  //   Object.defineProperty(navigator, 'webdriver', { get: () => false });
+  //   // @ts-expect-error mock chrome.runtime for tests
+  //   window.chrome = { runtime: {} };
+  //   Object.defineProperty(navigator, 'languages', {
+  //     get: () => ['uk-UA', 'uk'],
+  //   });
+  //   Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
+  // });
 
-  await page.setExtraHTTPHeaders({
-    'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
-  });
+  // await page.setExtraHTTPHeaders({
+  //   'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
+  // });
 
   await page.setBypassCSP(true);
 
   // Логування реклами без блокування Megogo API
-  // page.on('requestfailed', req => {
-  //   const url = req.url();
-  //   if (url.includes('ads.') || url.includes('doubleclick')) {
-  //     console.log('❌ Blocked ad:', url);
-  //   }
-  // });
+  page.on('requestfailed', req => {
+    const url = req.url();
+    if (url.includes('ads.') || url.includes('doubleclick')) {
+      console.log('❌ Blocked ad:', url);
+    }
+  });
 
   return { browser, page };
 };

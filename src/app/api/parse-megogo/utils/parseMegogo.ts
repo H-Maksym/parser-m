@@ -34,6 +34,7 @@ export const launchBrowser = async () => {
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1080, height: 1024 },
     });
+    console.log('🚀 ~ launchBrowser ~ browser on server:');
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({
@@ -123,7 +124,7 @@ export async function parseMegogo(url: string) {
   // });
   const response = await page.goto(url, {
     waitUntil: 'networkidle2',
-    timeout: 35000,
+    timeout: 60000,
   });
 
   // 🖼️ Зберігаємо скріншот у /tmp
@@ -134,7 +135,7 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  // await new Promise(resolve => setTimeout(resolve, 5000));
 
   //  Клікаємо по кнопці погодження віку
   await page.click(

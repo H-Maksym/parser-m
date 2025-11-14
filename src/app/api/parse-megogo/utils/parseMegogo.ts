@@ -22,13 +22,13 @@ export const launchBrowser = async () => {
 
   if (isRemote) {
     browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       args: [
         ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--ignore-certificate-errors',
-        '--disable-blink-features=AutomationControlled',
+        // '--ignore-certificate-errors',
+        // '--disable-blink-features=AutomationControlled',
       ],
       executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),

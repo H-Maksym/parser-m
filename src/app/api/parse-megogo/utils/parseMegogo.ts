@@ -156,6 +156,9 @@ export async function parseMegogo(url: string) {
     : `public/${screenshotFileName}`;
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
+  const bodyHTML = await page.$eval('body', el => el.innerText);
+  console.log('🚀 ~ parseMegogo ~ bodyHTML:', bodyHTML);
+  //.scroll({    scrollLeft: 10,    scrollTop: 100,  });
 
   // const html = await page.content();
   // console.log('🚀 ~ parseMegogo ~ html:', html);
@@ -282,5 +285,5 @@ export async function parseMegogo(url: string) {
 
   await browser.close();
 
-  return { pageTitle: '', results: [] };
+  return { pageTitle: '', results: '' };
 }

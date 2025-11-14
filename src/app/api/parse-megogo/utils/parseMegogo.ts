@@ -147,32 +147,48 @@ export async function parseMegogo(url: string) {
   await page.bringToFront();
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const consent = await page.$$eval('div[class*="consent"]', els =>
-    els.map(el => ({
-      text: el.innerText.trim(),
-      class: el.className,
-      html: el.outerHTML,
-    })),
-  ); // повертає ElementHandle або null
-  console.log('🚀 ~ parseMegogo ~ consent:', consent);
+  // const consent = await page.$$eval('div[class*="consent"]', els =>
+  //   els.map(el => ({
+  //     text: el.innerText.trim(),
+  //     class: el.className,
+  //     html: el.outerHTML,
+  //   })),
+  // ); // повертає ElementHandle або null
+  // console.log('🚀 ~ parseMegogo ~ consent:', consent);
 
-  const dialog = await page.$$eval('div[class*="dialog"]', els =>
-    els.map(el => ({
-      text: el.innerText.trim(),
-      class: el.className,
-      html: el.outerHTML,
-    })),
-  ); // повертає ElementHandle або null
-  console.log('🚀 ~ parseMegogo ~ dialog:', dialog);
+  // const dialog = await page.$$eval('div[class*="dialog"]', els =>
+  //   els.map(el => ({
+  //     text: el.innerText.trim(),
+  //     class: el.className,
+  //     html: el.outerHTML,
+  //   })),
+  // ); // повертає ElementHandle або null
+  // console.log('🚀 ~ parseMegogo ~ dialog:', dialog);
 
-  const btn = await page.$$eval('div[class*="btn"]', els =>
-    els.map(el => ({
-      text: el.innerText.trim(),
-      class: el.className,
-      html: el.outerHTML,
-    })),
-  ); // повертає ElementHandle або null
-  console.log('🚀 ~ parseMegogo ~ btn:', btn);
+  const elementsWithText = await page.$$eval('*', els => {
+    return els
+      .filter(
+        (el): el is HTMLElement =>
+          el instanceof HTMLElement && el.innerText.includes('Принять'),
+      )
+      .map(el => ({
+        tag: el.tagName,
+        text: el.innerText.trim(),
+        class: el.className,
+        html: el.outerHTML,
+      }));
+  });
+
+  console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
+
+  // const btn = await page.$$eval('button', els =>
+  //   els.map(el => ({
+  //     text: el.innerText.trim(),
+  //     class: el.className,
+  //     html: el.outerHTML,
+  //   })),
+  // ); // повертає ElementHandle або null
+  // console.log('🚀 ~ parseMegogo ~ btn:', btn);
 
   // const bodyHTML = await page.$eval('body', el => el.innerText);
   // console.log('🚀 ~ parseMegogo ~ bodyHTML:', bodyHTML);
@@ -191,18 +207,6 @@ export async function parseMegogo(url: string) {
 
   // await new Promise(resolve => setTimeout(resolve, 5000));
 
-  // const modals = await page.$$eval('div.modal', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-  //   })),
-  // );
-
-  // console.log('🚀 ~ parseMegogo ~ modal:', modals);
-  // const bodyHTML = await page.locator('body');
-  // console.log('🚀 ~ parseMeggo ~ html:', bodyHTML);
-
   // const divs = await page.$$eval('button', els =>
   //   els.map(el => ({
   //     text: el.innerText.trim(),
@@ -212,96 +216,97 @@ export async function parseMegogo(url: string) {
   // );
 
   // //  Клікаємо по кнопці
-  // await page.click(
-  //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  // );
+  await page.click(
+    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  );
 
-  // if (!response || !response.ok()) {
-  //   console.error(
-  //     'Failed to load the page:',
-  //     response ? response.status() : 'No response',
-  //   );
-  // }
-  // console.log('✅ Page loaded with status:', response?.status());
+  if (!response || !response.ok()) {
+    console.error(
+      'Failed to load the page:',
+      response ? response.status() : 'No response',
+    );
+  }
+  console.log('✅ Page loaded with status:', response?.status());
 
-  // const pageTitle = await page.evaluate(() => {
-  //   const h1 = document.querySelector('h1.video-title[itemprop="name"]');
-  //   return h1 ? h1.textContent?.trim() : '';
-  // });
-  // console.log('🎬 Title:', pageTitle);
+  const pageTitle = await page.evaluate(() => {
+    const h1 = document.querySelector('h1.video-title[itemprop="name"]');
+    return h1 ? h1.textContent?.trim() : '';
+  });
+  console.log('🎬 Title:', pageTitle);
 
-  // // почекати вручну, якщо треба
-  // await new Promise(resolve => setTimeout(resolve, 5000));
+  // почекати вручну, якщо треба
+  await new Promise(resolve => setTimeout(resolve, 5000));
 
-  // await page.waitForSelector('ul.seasons-list');
+  await page.waitForSelector('ul.seasons-list');
 
-  // const seasons = await page.$$eval('ul.seasons-list li a', links =>
-  //   links.map(a => ({
-  //     title: a.textContent?.trim() ?? '',
-  //     href: (a as HTMLAnchorElement).href,
-  //     dataId: a.getAttribute('data-season')
-  //       ? JSON.parse(a.getAttribute('data-season')!).id
-  //       : '',
-  //   })),
-  // );
+  const seasons = await page.$$eval('ul.seasons-list li a', links =>
+    links.map(a => ({
+      title: a.textContent?.trim() ?? '',
+      href: (a as HTMLAnchorElement).href,
+      dataId: a.getAttribute('data-season')
+        ? JSON.parse(a.getAttribute('data-season')!).id
+        : '',
+    })),
+  );
 
-  // const results: Record<string, Array<{ title: string; url: string }>> = {};
+  const results: Record<string, Array<{ title: string; url: string }>> = {};
 
-  // for (const season of seasons) {
-  //   await page.goto(season.href, { waitUntil: 'domcontentloaded' });
+  for (const season of seasons) {
+    await page.goto(season.href, { waitUntil: 'domcontentloaded' });
 
-  //   await page.waitForSelector(
-  //     `.season-container[data-season-id="${season.dataId}"].is-loaded .cards-list`,
-  //   );
+    await page.waitForSelector(
+      `.season-container[data-season-id="${season.dataId}"].is-loaded .cards-list`,
+    );
 
-  //   const nextSelector = '.season-container a[data-mgg-action="next"]';
+    const nextSelector = '.season-container a[data-mgg-action="next"]';
 
-  //   while (true) {
-  //     const nextLink = await page.$(nextSelector);
-  //     if (!nextLink) break;
+    while (true) {
+      const nextLink = await page.$(nextSelector);
+      if (!nextLink) break;
 
-  //     await page.evaluate(el => {
-  //       el.dispatchEvent(
-  //         new MouseEvent('click', { bubbles: true, cancelable: true }),
-  //       );
-  //     }, nextLink);
+      await page.evaluate(el => {
+        el.dispatchEvent(
+          new MouseEvent('click', { bubbles: true, cancelable: true }),
+        );
+      }, nextLink);
 
-  //     await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 500));
 
-  //     const isDisabled = await nextLink.evaluate(
-  //       el =>
-  //         el.classList.contains('disabled') ||
-  //         el.getAttribute('aria-disabled') === 'true' ||
-  //         el.hasAttribute('disabled'),
-  //     );
-  //     if (isDisabled) break;
-  //   }
+      const isDisabled = await nextLink.evaluate(
+        el =>
+          el.classList.contains('disabled') ||
+          el.getAttribute('aria-disabled') === 'true' ||
+          el.hasAttribute('disabled'),
+      );
+      if (isDisabled) break;
+    }
 
-  //   const episodes = await page.$$eval(
-  //     `.season-container[data-season-id="${season.dataId}"].is-loaded .cards-list .card`,
-  //     cards =>
-  //       cards
-  //         .map(card => {
-  //           const title =
-  //             card.getAttribute('data-episode-title') ||
-  //             card
-  //               .querySelector('[data-episode-title]')
-  //               ?.getAttribute('data-episode-title') ||
-  //             '';
-  //           const href = card.querySelector('a')?.getAttribute('href') ?? '';
-  //           return {
-  //             title,
-  //             url: href ? new URL(href, window.location.origin).href : '',
-  //           };
-  //         })
-  //         .filter(e => e.title && e.url),
-  //   );
+    const episodes = await page.$$eval(
+      `.season-container[data-season-id="${season.dataId}"].is-loaded .cards-list .card`,
+      cards =>
+        cards
+          .map(card => {
+            const title =
+              card.getAttribute('data-episode-title') ||
+              card
+                .querySelector('[data-episode-title]')
+                ?.getAttribute('data-episode-title') ||
+              '';
+            const href = card.querySelector('a')?.getAttribute('href') ?? '';
+            return {
+              title,
+              url: href ? new URL(href, window.location.origin).href : '',
+            };
+          })
+          .filter(e => e.title && e.url),
+    );
 
-  //   results[season.title] = episodes;
-  // }
+    results[season.title] = episodes;
+  }
   console.log('✅ Close browser:');
 
   await browser.close();
 
-  return { pageTitle: '', results: {} };
+  // return { pageTitle: '', results: {} };
+  return { pageTitle, results };
 }

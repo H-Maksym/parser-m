@@ -188,7 +188,7 @@ export async function parseMegogo(url: string) {
 
   console.log('🚀 ~ parseMegogo ~ modal:', modals);
 
-  const divs = await page.$$eval('div', els =>
+  const divs = await page.$$eval('button', els =>
     els.map(el => ({
       text: el.innerText.trim(),
       class: el.className,
@@ -197,10 +197,10 @@ export async function parseMegogo(url: string) {
   );
   console.log('🚀 ~ parseMegogo ~ divs:', divs);
 
-  //  Клікаємо по кнопці
-  await page.click(
-    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  );
+  // //  Клікаємо по кнопці
+  // await page.click(
+  //   '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  // );
 
   if (!response || !response.ok()) {
     console.error(

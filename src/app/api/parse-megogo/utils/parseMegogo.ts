@@ -169,28 +169,28 @@ export async function parseMegogo(url: string) {
   // ); // повертає ElementHandle або null
   // console.log('🚀 ~ parseMegogo ~ consent:', consent);
 
-  const dialog = await page.$$eval('div[class*="popup"]', els =>
-    els.map(el => ({
-      text: el.innerText.trim(),
-      class: el.className,
-      html: el.outerHTML,
-    })),
-  ); // повертає ElementHandle або null
-  console.log('🚀 ~ parseMegogo ~ button:', dialog);
+  // const dialog = await page.$$eval('div[class*="popup"]', els =>
+  //   els.map(el => ({
+  //     text: el.innerText.trim(),
+  //     class: el.className,
+  //     html: el.outerHTML,
+  //   })),
+  // ); // повертає ElementHandle або null
+  // console.log('🚀 ~ parseMegogo ~ button:', dialog);
 
-  // const elementsWithText = await page.$$eval('*', els => {
-  //   return els
-  //     .filter(
-  //       (el): el is HTMLElement =>
-  //         el instanceof HTMLElement && el.innerText.includes('Принять'),
-  //     )
-  //     .map(el => ({
-  //       tag: el.tagName,
-  //       text: el.innerText.trim(),
-  //       class: el.className,
-  //       html: el.outerHTML,
-  //     }));
-  // });
+  const elementsWithText = await page.$$eval('*', els => {
+    return els
+      .filter(
+        (el): el is HTMLElement =>
+          el instanceof HTMLElement && el.innerText.includes('Принять'),
+      )
+      .map(el => ({
+        tag: el.tagName,
+        text: el.innerText.trim(),
+        class: el.className,
+        html: el.outerHTML,
+      }));
+  });
 
   // console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
 

@@ -46,7 +46,8 @@ export const launchBrowser = async () => {
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({
-      headless: false,
+      headless: true,
+      pipe: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -97,29 +98,30 @@ export async function parseMegogo(url: string) {
 
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
-  // await page.setRequestInterception(true);
-  // page.on('request', req => {
-  //   const url = req.url();
-  //   const blockedResources =
-  //   [
-  //     'google-analytics.com',
-  //     'bluekai.com',
-  //     'mgid.com',
-  //     'admixer.net',
-  //     'megogo.net/v5/tracker',
-  //     'adtcdn.com',
-  //     'googletagservices.com',
-  //     'doubleclick.net',
-  //     'googletagmanager.com',
-  //     'gstatic.com/prebid',
-  //   ];
-  //   if (blockedResources.some(domain => url.includes(domain))) {
-  //     // console.log('⛔ Blocked:', url);
-  //     req.abort();
-  //   } else {
-  //     req.continue();
-  //   }
-  // });
+  if (!isRemote) {
+    await page.setRequestInterception(true);
+    page.on('request', req => {
+      const url = req.url();
+      const blockedResources = [
+        'google-analytics.com',
+        'bluekai.com',
+        'mgid.com',
+        'admixer.net',
+        'megogo.net/v5/tracker',
+        'adtcdn.com',
+        'googletagservices.com',
+        'doubleclick.net',
+        'googletagmanager.com',
+        'gstatic.com/prebid',
+      ];
+      if (blockedResources.some(domain => url.includes(domain))) {
+        // console.log('⛔ Blocked:', url);
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
+  }
 
   // // Встановлюємо User-Agent
   await page.setUserAgent({
@@ -139,7 +141,11 @@ export async function parseMegogo(url: string) {
     timeout: 60000,
   });
 
-  // // 🖼️ Зберігаємо скріншот у /tmp
+  await page.evaluate(() => {
+    window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
+  });
+
+  // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;
   const screenshotPath = isRemote
     ? `/tmp/${screenshotFileName}`
@@ -196,29 +202,22 @@ export async function parseMegogo(url: string) {
 
   // const html = await page.content();
   // console.log('🚀 ~ parseMegogo ~ html:', html);
-
-  // const btnAge = await page.evaluate(() => {
-  //   const btn = document.querySelector(
-  //     '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  //   );
-  //   return btn ? btn.innerHTML : null;
-  // });
-  // console.log('🎬 btnAge:', btnAge);
-
   // await new Promise(resolve => setTimeout(resolve, 5000));
 
-  // const divs = await page.$$eval('button', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-  //   })),
-  // );
+  //  Клікаємо по кнопці
+  const btnConsentAge = await page.evaluate(() => {
+    const btn = document.querySelector(
+      '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+    );
+    return btn ? btn.innerHTML : null;
+  });
+  console.log('🎬 btnAge:', btnConsentAge);
 
-  // //  Клікаємо по кнопці
-  await page.click(
-    '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  );
+  if (btnConsentAge) {
+    await page.click(
+      '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+    );
+  }
 
   if (!response || !response.ok()) {
     console.error(

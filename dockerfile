@@ -49,13 +49,13 @@ RUN pnpm store prune
 
 # 5. Встановлюємо залежності
 RUN pnpm install --frozen-lockfile
-RUN pnpm dlx puppeteer browsers install chrome
+# RUN pnpm dlx puppeteer browsers install chrome
 
 
-# 6. Завантажуємо кастомний Chromium, який ти використовуєш у коді
-RUN wget https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar && \
-    tar -xf chromium-v121.0.0-pack.tar -C /usr/local/bin && \
-    rm chromium-v121.0.0-pack.tar
+# # 6. Завантажуємо кастомний Chromium, який ти використовуєш у коді
+# RUN wget https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar && \
+#     tar -xf chromium-v121.0.0-pack.tar -C /usr/local/bin && \
+#     rm chromium-v121.0.0-pack.tar
 
 # 7. Копіюємо весь код у контейнер
 COPY . .
@@ -69,7 +69,7 @@ RUN pnpm build
 FROM node:22 AS runner
 
 ENV IS_DOCKER=true
-ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/local/bin/chromium"
 
 # Встановлюємо Chromium + необхідні бібліотеки
 RUN apt-get update && apt-get install -y \

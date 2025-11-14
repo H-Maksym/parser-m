@@ -4,14 +4,14 @@ import puppeteer from 'puppeteer-core';
 const isRemote =
   !!process.env.AWS_REGION ||
   !!process.env.VERCEL ||
-  // !!process.env.IS_DOCKER ||
+  !!process.env.IS_DOCKER ||
   !!process.env.IS_RENDER;
 
 export const launchBrowser = async () => {
   // const chromiumPack =
   //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
-  const isDocker = !!process.env.IS_DOCKER;
+  // const isDocker = !!process.env.IS_DOCKER;
 
   // const urlChromium = isRemote
   //   ? chromiumPack
@@ -39,23 +39,15 @@ export const launchBrowser = async () => {
       '🚀 ~ launchBrowser  -  Browser on server',
       await browser.version(),
     );
-  } else if (isDocker) {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined, // Sparticuz автоматично підбирає шлях
-      // executablePath: await chromium.executablePath(urlChromium ?? undefined),
-      defaultViewport: { width: 1366, height: 768 },
-    });
-    console.log(
-      '🚀 ~ launchBrowser  -  Browser on server docker',
-      await browser.version(),
-    );
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage', // важливо для Render
+      ],
       defaultViewport: { width: 1366, height: 768 },
     });
     console.log('🚀 ~ launchBrowser  - Browser local', await browser.version());
@@ -142,7 +134,6 @@ export async function parseMegogo(url: string) {
     waitUntil: 'networkidle2',
     timeout: 60000,
   });
-  console.log('🚀 ~ parseMegogo ~ response:', response);
 
   // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;
@@ -151,8 +142,18 @@ export async function parseMegogo(url: string) {
     : `public/${screenshotFileName}`;
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
-  const bodyHTML = await page.$eval('body', el => el.innerText);
-  console.log('🚀 ~ parseMegogo ~ bodyHTML:', bodyHTML);
+
+  const modal = await page.$$eval('div.modal', els =>
+    els.map(el => ({
+      text: el.innerText.trim(),
+      class: el.className,
+      html: el.outerHTML,
+    })),
+  ); // повертає ElementHandle або null
+  console.log('🚀 ~ parseMegogo ~ modal:', modal);
+
+  // const bodyHTML = await page.$eval('body', el => el.innerText);
+  // console.log('🚀 ~ parseMegogo ~ bodyHTML:', bodyHTML);
   //.scroll({    scrollLeft: 10,    scrollTop: 100,  });
 
   // const html = await page.content();

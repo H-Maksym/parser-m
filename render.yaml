@@ -1,0 +1,5 @@
+# staticPublishPath: public
+headers:
+  - path: /*
+    name: Cache-Control
+    value: no-store

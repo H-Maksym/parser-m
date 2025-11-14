@@ -11,7 +11,7 @@ export const launchBrowser = async () => {
   // const chromiumPack =
   //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
-  const isDocker = !!process.env.IS_DOCKER;
+  // const isDocker = !!process.env.IS_DOCKER;
 
   // const urlChromium = isRemote
   //   ? chromiumPack
@@ -179,7 +179,8 @@ export async function parseMegogo(url: string) {
   // );
 
   // console.log('🚀 ~ parseMegogo ~ modal:', modals);
-  const html = await page.content();
+  const bodyHTML = await page.locator('body');
+  console.log('🚀 ~ parseMeggo ~ html:', bodyHTML);
 
   // const divs = await page.$$eval('button', els =>
   //   els.map(el => ({
@@ -188,7 +189,6 @@ export async function parseMegogo(url: string) {
   //     // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
   //   })),
   // );
-  console.log('🚀 ~ parseMegogo ~ html:', html);
 
   // //  Клікаємо по кнопці
   await page.click(

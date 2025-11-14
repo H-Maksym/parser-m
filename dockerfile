@@ -128,11 +128,11 @@
 
 
 # 1. Базовий образ, що має Chrome + потрібні залежності  
-FROM ghcr.io/puppeteer/puppeteer:latest
+FROM ghcr.io/puppeteer/puppeteer:22-node20
 
 WORKDIR /app
 
-# Встановлюємо pnpm глобально (надійніше ніж corepack)
+# Встановлюємо pnpm
 RUN npm install -g pnpm
 
 # Копіюємо lock-файли

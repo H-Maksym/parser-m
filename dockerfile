@@ -1,5 +1,5 @@
 # 1. Базовий образ з Node.js 20 для більшої сумісності (Debian-based)
-FROM node:22 AS builder
+FROM node:22-alpine AS builder
 
 ENV IS_DOCKER=true
 # RUN pnpm dlx puppeteer browsers install chrome
@@ -65,7 +65,7 @@ RUN pnpm build
 # ---------------
 
 # 9. Другий етап — створення мінімального production образу
-FROM node:22 AS runner
+FROM node:22-alpine AS runner
 
 ENV IS_DOCKER=true
 

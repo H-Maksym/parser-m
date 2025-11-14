@@ -128,7 +128,7 @@
 
 
 # 1. Базовий образ, що має Chrome + потрібні залежності  
-FROM ghcr.io/puppeteer/puppeteer:22-node20
+FROM ghcr.io/puppeteer/puppeteer:22.13.0
 
 WORKDIR /app
 

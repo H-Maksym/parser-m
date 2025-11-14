@@ -2,6 +2,8 @@
 FROM node:22 AS builder
 
 ENV IS_DOCKER=true
+# RUN pnpm dlx puppeteer browsers install chrome
+
 
 # Встановлюємо Chromium + необхідні бібліотеки
 RUN apt-get update && apt-get install -y \
@@ -46,6 +48,8 @@ RUN pnpm store prune
 
 # 5. Встановлюємо залежності
 RUN pnpm install --frozen-lockfile
+RUN pnpm dlx puppeteer browsers install chrome
+
 
 # 6. Завантажуємо кастомний Chromium, який ти використовуєш у коді
 RUN wget https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar && \

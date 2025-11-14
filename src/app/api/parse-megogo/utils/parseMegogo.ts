@@ -35,7 +35,10 @@ export const launchBrowser = async () => {
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
     });
-    console.log('🚀 ~ launchBrowser  -  Browser on server');
+    console.log(
+      '🚀 ~ launchBrowser  -  Browser on server',
+      await browser.version(),
+    );
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({
@@ -43,7 +46,7 @@ export const launchBrowser = async () => {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       defaultViewport: { width: 1366, height: 768 },
     });
-    console.log('🚀 ~ launchBrowser  - Browser local');
+    console.log('🚀 ~ launchBrowser  - Browser local', await browser.version());
   }
 
   const page = await browser.newPage();
@@ -53,20 +56,20 @@ export const launchBrowser = async () => {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
   });
 
-  // await page.evaluateOnNewDocument(() => {
-  //   Object.defineProperty(navigator, 'webdriver', { get: () => false });
-  //   // @ts-expect-error mock chrome.runtime for tests
-  //   window.chrome = { runtime: {} };
-  //   Object.defineProperty(navigator, 'languages', {
-  //     get: () => ['uk-UA', 'uk'],
-  //   });
-  //   Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
-  //   console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
-  // });
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    // @ts-expect-error mock chrome.runtime for tests
+    window.chrome = { runtime: {} };
+    Object.defineProperty(navigator, 'languages', {
+      get: () => ['uk-UA', 'uk'],
+    });
+    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
+    console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
+  });
 
-  // await page.setExtraHTTPHeaders({
-  //   'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
-  // });
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
+  });
 
   await page.setBypassCSP(true);
 

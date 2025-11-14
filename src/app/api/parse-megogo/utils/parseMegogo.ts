@@ -79,6 +79,7 @@ export const launchBrowser = async () => {
 };
 
 export async function parseMegogo(url: string) {
+  console.log('🚀 ~ parseMegogo ~ parseMegogo: running');
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
   // await page.setRequestInterception(true);
@@ -117,11 +118,20 @@ export async function parseMegogo(url: string) {
   //   console.error('⚠️ Request failed:', req.url(), req.failure()),
   // );
 
-  // Завантаження сторінки з повним очікуванням
+  // Завантажуємо сторінку
+  // завантаження з повним очікуванням
+  // const response = await page.goto(url, {
+  //   waitUntil: 'domcontentloaded',
+  // });
   const response = await page.goto(url, {
     waitUntil: 'networkidle2',
     timeout: 60000,
   });
+
+  // Прочитати кукіси
+
+  // const cookies = await browser.cookies();
+  // console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 
   // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;
@@ -131,13 +141,67 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // const btnAge = await page.evaluate(() => {
-  //   const btn = document.querySelector(
-  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+  // const elementsHTML = await page.evaluate(text => {
+  //   return Array.from(document.querySelectorAll('*'))
+  //     .filter(
+  //       e =>
+  //         e.textContent.toLowerCase() &&
+  //         e.textContent.includes(text.toLowerCase()),
+  //     )
+  //     .map(e => {
+  //       console.log('🚀 ~ parseMegogo ~ e:', e);
+  //       return e.outerHTML;
+  //     });
+  // }, text);
+
+  // console.log('-----Кукіси-----', elementsHTML);
+  // const searchText = 'Принять все';
+  // const searchText2 = 'Принять только';
+
+  // const elements = await page.$$('button, a, p, div, h1, h2, h3 ');
+
+  // for (const el of elements) {
+  //   const text = await page.evaluate(
+  //     el => el.textContent.trim().toLowerCase(),
+  //     el,
   //   );
-  //   return btn ? btn.innerHTML : null;
-  // });
-  // console.log('🎬 btnAge:', btnAge);
+  //   if (text.includes(searchText.trim().toLowerCase())) {
+  //     // 🔍 тут умова пошуку по контенту
+  //     const includesHtml = await page.evaluate(el => el.outerHTML, el);
+  //     console.log('=== MATCH ===');
+  //     console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml);
+  //   }
+
+  //   if (text.includes(searchText2.trim().toLowerCase())) {
+  //     // 🔍 тут умова пошуку по контенту
+  //     const includesHtml2 = await page.evaluate(el => el.outerHTML, el);
+  //     console.log('=== MATCH ===');
+  //     console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml2);
+  //   }
+  // }
+
+  // Чекаємо поки кнопка з'явиться в DOM
+  //   await page.waitForSelector(
+  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+  //     { timeout: 5000 },
+  //   );
+
+  const buttons = await page.$$eval('button', els =>
+    els.map(el => ({
+      text: el.innerText.trim(),
+      class: el.className,
+      attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
+    })),
+  );
+  console.log('🚀 ~ parseMegogo ~ buttons:', buttons);
+
+  const btnAge = await page.evaluate(() => {
+    const btn = document.querySelector(
+      '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
+    );
+    return btn ? btn.innerHTML : null;
+  });
+  console.log('🎬 btnAge:', btnAge);
 
   await new Promise(resolve => setTimeout(resolve, 5000));
 

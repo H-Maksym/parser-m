@@ -69,27 +69,27 @@ export const launchBrowser = async () => {
 
   const page = await browser.newPage();
 
-  await page.setUserAgent({
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  });
+  // await page.setUserAgent({
+  //   userAgent:
+  //     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  // });
 
-  await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-    // @ts-expect-error mock chrome.runtime for tests
-    window.chrome = { runtime: {} };
-    Object.defineProperty(navigator, 'languages', {
-      get: () => ['uk-UA', 'uk'],
-    });
-    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
-    console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
-  });
+  // await page.evaluateOnNewDocument(() => {
+  //   Object.defineProperty(navigator, 'webdriver', { get: () => false });
+  //   // @ts-expect-error mock chrome.runtime for tests
+  //   window.chrome = { runtime: {} };
+  //   Object.defineProperty(navigator, 'languages', {
+  //     get: () => ['uk-UA', 'uk'],
+  //   });
+  //   Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
+  //   console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
+  // });
 
-  await page.setExtraHTTPHeaders({
-    'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
-  });
+  // await page.setExtraHTTPHeaders({
+  //   'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
+  // });
 
-  await page.setBypassCSP(true);
+  // await page.setBypassCSP(true);
 
   // Логування реклами без блокування Megogo API
   // page.on('requestfailed', req => {

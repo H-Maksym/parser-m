@@ -38,13 +38,7 @@ export const launchBrowser = async () => {
   } else if (!!process.env.IS_VERCEL) {
     browser = await puppeteer.launch({
       headless: true,
-      args: [
-        ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--ignore-certificate-errors',
-        '--disable-blink-features=AutomationControlled',
-      ],
+      args: [...chromium.args, '--disable-extensions'],
       executablePath: await chromium.executablePath(chromiumPack), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
@@ -145,16 +139,16 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  try {
-    await page.evaluate(() => window.scrollBy(400, document.body.scrollHeight));
-    const pdfFileName = `pdfFileName.pdf`;
-    const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;
-    await page.pdf({
-      path: pdfPath,
-    });
-  } catch (error) {
-    console.log('error in try-catch', error);
-  }
+  await page.evaluate(() => window.scrollBy(400, document.body.scrollHeight));
+  // try {
+  //   const pdfFileName = `pdfFileName.pdf`;
+  //   const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;
+  //   await page.pdf({
+  //     path: pdfPath,
+  //   });
+  // } catch (error) {
+  //   console.log('error in try-catch', error);
+  // }
 
   // Чекаємо поки кнопка з'явиться в DOM
   //   await page.waitForSelector(

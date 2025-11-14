@@ -39,24 +39,24 @@ export const launchBrowser = async () => {
       '🚀 ~ launchBrowser  -  Browser on server',
       await browser.version(),
     );
-    // } else if (isDocker) {
-    //   browser = await puppeteer.launch({
-    //     headless: true,
-    //     args: [
-    //       ...chromium.args,
-    //       '--no-sandbox',
-    //       '--disable-setuid-sandbox',
-    //       '--ignore-certificate-errors',
-    //       '--disable-blink-features=AutomationControlled',
-    //     ],
-    //     executablePath: await chromium.executablePath('/usr/bin/chromium'), // Sparticuz автоматично підбирає шлях
-    //     // executablePath: await chromium.executablePath(urlChromium ?? undefined),
-    //     defaultViewport: { width: 1366, height: 768 },
-    //   });
-    //   console.log(
-    //     '🚀 ~ launchBrowser  -  Browser on server',
-    //     await browser.version(),
-    //   );
+  } else if (isDocker) {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--ignore-certificate-errors',
+        '--disable-blink-features=AutomationControlled',
+      ],
+      executablePath: await chromium.executablePath('/usr/bin/chromium'), // Sparticuz автоматично підбирає шлях
+      // executablePath: await chromium.executablePath(urlChromium ?? undefined),
+      defaultViewport: { width: 1366, height: 768 },
+    });
+    console.log(
+      '🚀 ~ launchBrowser  -  Browser on server',
+      await browser.version(),
+    );
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({

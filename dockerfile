@@ -132,22 +132,19 @@ FROM ghcr.io/puppeteer/puppeteer:22.13.0
 
 WORKDIR /app
 
-# Встановлюємо pnpm
-RUN npm install -g pnpm
+# Копіюємо package.json та package-lock.json
+COPY package.json package-lock.json ./
 
-# Копіюємо lock-файли
-COPY package.json pnpm-lock.yaml ./
+# Інсталяція залежностей через npm
+RUN npm install
 
-# Інсталяція залежностей
-RUN pnpm install --frozen-lockfile
-
-# Копіюємо весь код
+# Копіюємо решту файлів
 COPY . .
 
 # Збірка Next.js
-RUN pnpm run build
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
 

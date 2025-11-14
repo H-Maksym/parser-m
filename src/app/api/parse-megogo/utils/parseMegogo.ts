@@ -191,6 +191,7 @@ export async function parseMegogo(url: string) {
         html: el.outerHTML,
       }));
   });
+  console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
 
   // console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
 

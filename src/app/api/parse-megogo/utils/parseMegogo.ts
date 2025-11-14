@@ -35,7 +35,7 @@ export const launchBrowser = async () => {
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
     });
-    console.log('Browser on server');
+    console.log('🚀 ~ launchBrowser  -  Browser on server');
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({
@@ -43,7 +43,7 @@ export const launchBrowser = async () => {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       defaultViewport: { width: 1366, height: 768 },
     });
-    console.log('Browser local');
+    console.log('🚀 ~ launchBrowser  - Browser local');
   }
 
   const page = await browser.newPage();
@@ -61,6 +61,7 @@ export const launchBrowser = async () => {
       get: () => ['uk-UA', 'uk'],
     });
     Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
+    console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
   });
 
   await page.setExtraHTTPHeaders({
@@ -81,7 +82,7 @@ export const launchBrowser = async () => {
 };
 
 export async function parseMegogo(url: string) {
-  console.log('Launching parseMegogo');
+  console.log('🚀🚀🚀 Launching parseMegogo');
 
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
@@ -109,11 +110,11 @@ export async function parseMegogo(url: string) {
   //   }
   // });
 
-  // Встановлюємо User-Agent
-  await page.setUserAgent({
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  });
+  // // Встановлюємо User-Agent
+  // await page.setUserAgent({
+  //   userAgent:
+  //     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  // });
 
   // Логування помилок
   page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
@@ -135,33 +136,18 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // Чекаємо поки кнопка з'явиться в DOM
-  //   await page.waitForSelector(
-  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-  //     { timeout: 5000 },
+  // const html = await page.content();
+  // console.log('🚀 ~ parseMegogo ~ html:', html);
+
+  // const btnAge = await page.evaluate(() => {
+  //   const btn = document.querySelector(
+  //     '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
   //   );
+  //   return btn ? btn.innerHTML : null;
+  // });
+  // console.log('🎬 btnAge:', btnAge);
 
-  // const divs = await page.$$eval('div', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-  //   })),
-  // );
-  // console.log('🚀 ~ parseMegogo ~ divs:', divs);
-
-  const html = await page.content();
-  console.log('🚀 ~ parseMegogo ~ html:', html);
-
-  const btnAge = await page.evaluate(() => {
-    const btn = document.querySelector(
-      '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-    );
-    return btn ? btn.innerHTML : null;
-  });
-  console.log('🎬 btnAge:', btnAge);
-
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  // await new Promise(resolve => setTimeout(resolve, 5000));
 
   //  Клікаємо по кнопці
   await page.click(
@@ -251,6 +237,7 @@ export async function parseMegogo(url: string) {
 
     results[season.title] = episodes;
   }
+  console.log('✅ Close browser:');
 
   await browser.close();
 

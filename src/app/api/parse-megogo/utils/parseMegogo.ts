@@ -24,9 +24,10 @@ export const launchBrowser = async () => {
   if (isRemote) {
     browser = await puppeteer.launch({
       headless: true,
-      //added last
-      protocolTimeout: 3_000,
+      //added last for screen
+      protocolTimeout: 180_000,
       protocol: 'cdp',
+      pipe: true,
       args: [
         ...chromium.args,
         '--no-sandbox',
@@ -58,35 +59,35 @@ export const launchBrowser = async () => {
 
   const page = await browser.newPage();
 
-  // await page.setUserAgent({
-  //   userAgent:
-  //     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  // });
+  await page.setUserAgent({
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  });
 
-  // await page.evaluateOnNewDocument(() => {
-  //   Object.defineProperty(navigator, 'webdriver', { get: () => false });
-  //   // @ts-expect-error mock chrome.runtime for tests
-  //   window.chrome = { runtime: {} };
-  //   Object.defineProperty(navigator, 'languages', {
-  //     get: () => ['uk-UA', 'uk'],
-  //   });
-  //   Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
-  //   console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
-  // });
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    // @ts-expect-error mock chrome.runtime for tests
+    window.chrome = { runtime: {} };
+    Object.defineProperty(navigator, 'languages', {
+      get: () => ['uk-UA', 'uk'],
+    });
+    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
+    console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
+  });
 
-  // await page.setExtraHTTPHeaders({
-  //   'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
-  // });
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
+  });
 
-  // await page.setBypassCSP(true);
+  await page.setBypassCSP(true);
 
   // Логування реклами без блокування Megogo API
-  // page.on('requestfailed', req => {
-  //   const url = req.url();
-  //   if (url.includes('ads.') || url.includes('doubleclick')) {
-  //     console.log('❌ Blocked ad:', url);
-  //   }
-  // });
+  page.on('requestfailed', req => {
+    const url = req.url();
+    if (url.includes('ads.') || url.includes('doubleclick')) {
+      console.log('❌ Blocked ad:', url);
+    }
+  });
 
   return { browser, page };
 };
@@ -138,13 +139,13 @@ export async function parseMegogo(url: string) {
     timeout: 60000,
   });
 
-  // 🖼️ Зберігаємо скріншот у /tmp
-  const screenshotFileName = `screenshotFileName.png`;
-  const screenshotPath = isRemote
-    ? `/tmp/${screenshotFileName}`
-    : `public/${screenshotFileName}`;
-  await page.bringToFront();
-  await page.screenshot({ path: screenshotPath, fullPage: true });
+  // // 🖼️ Зберігаємо скріншот у /tmp
+  // const screenshotFileName = `screenshotFileName.png`;
+  // const screenshotPath = isRemote
+  //   ? `/tmp/${screenshotFileName}`
+  //   : `public/${screenshotFileName}`;
+  // await page.bringToFront();
+  // await page.screenshot({ path: screenshotPath, fullPage: true });
 
   const consent = await page.$$eval('div[class*="consent"]', els =>
     els.map(el => ({

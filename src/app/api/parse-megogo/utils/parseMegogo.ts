@@ -1,6 +1,5 @@
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
-
 const isRemote =
   !!process.env.AWS_REGION ||
   !!process.env.VERCEL ||
@@ -23,7 +22,7 @@ export const launchBrowser = async () => {
 
   if (isRemote) {
     browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: [
         ...chromium.args,
         '--no-sandbox',
@@ -33,12 +32,12 @@ export const launchBrowser = async () => {
       ],
       executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
-      defaultViewport: { width: 1366, height: 768 },
+      defaultViewport: { width: 1080, height: 1024 },
     });
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({
-      headless: false,
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       defaultViewport: { width: 1366, height: 768 },
     });
@@ -79,32 +78,31 @@ export const launchBrowser = async () => {
 };
 
 export async function parseMegogo(url: string) {
-  console.log('🚀 ~ parseMegogo ~ parseMegogo: running');
+  console.log('🚀 ~~~~~~~~~~ parseMegogo running ~~~~~~~>>>>>>>>');
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
-  // await page.setRequestInterception(true);
-  // page.on('request', req => {
-  //   const url = req.url();
-  //   const blockedResources =
-  //   [
-  //     'google-analytics.com',
-  //     'bluekai.com',
-  //     'mgid.com',
-  //     'admixer.net',
-  //     'megogo.net/v5/tracker',
-  //     'adtcdn.com',
-  //     'googletagservices.com',
-  //     'doubleclick.net',
-  //     'googletagmanager.com',
-  //     'gstatic.com/prebid',
-  //   ];
-  //   if (blockedResources.some(domain => url.includes(domain))) {
-  //     // console.log('⛔ Blocked:', url);
-  //     req.abort();
-  //   } else {
-  //     req.continue();
-  //   }
-  // });
+  await page.setRequestInterception(true);
+  page.on('request', req => {
+    const url = req.url();
+    const blockedResources = [
+      'google-analytics.com',
+      'bluekai.com',
+      'mgid.com',
+      'admixer.net',
+      'megogo.net/v5/tracker',
+      'adtcdn.com',
+      'googletagservices.com',
+      'doubleclick.net',
+      'googletagmanager.com',
+      'gstatic.com/prebid',
+    ];
+    if (blockedResources.some(domain => url.includes(domain))) {
+      // console.log('⛔ Blocked:', url);
+      req.abort();
+    } else {
+      req.continue();
+    }
+  });
 
   // Встановлюємо User-Agent
   await page.setUserAgent({
@@ -114,9 +112,9 @@ export async function parseMegogo(url: string) {
 
   // Логування помилок
   page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
-  // page.on('requestfailed', req =>
-  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
-  // );
+  page.on('requestfailed', req =>
+    console.error('⚠️ Request failed:', req.url(), req.failure()),
+  );
 
   // Завантажуємо сторінку
   // завантаження з повним очікуванням
@@ -125,13 +123,8 @@ export async function parseMegogo(url: string) {
   // });
   const response = await page.goto(url, {
     waitUntil: 'networkidle2',
-    timeout: 60000,
+    timeout: 35000,
   });
-
-  // Прочитати кукіси
-
-  // const cookies = await browser.cookies();
-  // console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 
   // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;
@@ -141,71 +134,9 @@ export async function parseMegogo(url: string) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // const elementsHTML = await page.evaluate(text => {
-  //   return Array.from(document.querySelectorAll('*'))
-  //     .filter(
-  //       e =>
-  //         e.textContent.toLowerCase() &&
-  //         e.textContent.includes(text.toLowerCase()),
-  //     )
-  //     .map(e => {
-  //       console.log('🚀 ~ parseMegogo ~ e:', e);
-  //       return e.outerHTML;
-  //     });
-  // }, text);
-
-  // console.log('-----Кукіси-----', elementsHTML);
-  // const searchText = 'Принять все';
-  // const searchText2 = 'Принять только';
-
-  // const elements = await page.$$('button, a, p, div, h1, h2, h3 ');
-
-  // for (const el of elements) {
-  //   const text = await page.evaluate(
-  //     el => el.textContent.trim().toLowerCase(),
-  //     el,
-  //   );
-  //   if (text.includes(searchText.trim().toLowerCase())) {
-  //     // 🔍 тут умова пошуку по контенту
-  //     const includesHtml = await page.evaluate(el => el.outerHTML, el);
-  //     console.log('=== MATCH ===');
-  //     console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml);
-  //   }
-
-  //   if (text.includes(searchText2.trim().toLowerCase())) {
-  //     // 🔍 тут умова пошуку по контенту
-  //     const includesHtml2 = await page.evaluate(el => el.outerHTML, el);
-  //     console.log('=== MATCH ===');
-  //     console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml2);
-  //   }
-  // }
-
-  // Чекаємо поки кнопка з'явиться в DOM
-  //   await page.waitForSelector(
-  //     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-  //     { timeout: 5000 },
-  //   );
-
-  const buttons = await page.$$eval('button', els =>
-    els.map(el => ({
-      text: el.innerText.trim(),
-      class: el.className,
-      attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-    })),
-  );
-  console.log('🚀 ~ parseMegogo ~ buttons:', buttons);
-
-  const btnAge = await page.evaluate(() => {
-    const btn = document.querySelector(
-      '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-    );
-    return btn ? btn.innerHTML : null;
-  });
-  console.log('🎬 btnAge:', btnAge);
-
   await new Promise(resolve => setTimeout(resolve, 5000));
 
-  //  Клікаємо по кнопці
+  //  Клікаємо по кнопці погодження віку
   await page.click(
     '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
   );
@@ -218,10 +149,12 @@ export async function parseMegogo(url: string) {
   }
   console.log('✅ Page loaded with status:', response?.status());
 
-  const pageTitle = await page.evaluate(() => {
-    const h1 = document.querySelector('h1.video-title[itemprop="name"]');
-    return h1 ? h1.textContent?.trim() : '';
-  });
+  const pageTitleSelector = await page
+    .locator('h1.video-title[itemprop="name"]')
+    .waitHandle();
+  const pageTitle = await pageTitleSelector?.evaluate(el =>
+    el.textContent.trim(),
+  );
   console.log('🎬 Title:', pageTitle);
 
   // почекати вручну, якщо треба
@@ -290,6 +223,7 @@ export async function parseMegogo(url: string) {
           })
           .filter(e => e.title && e.url),
     );
+    console.log('🚀 ~ parseMegogo ~ ended:');
 
     results[season.title] = episodes;
   }

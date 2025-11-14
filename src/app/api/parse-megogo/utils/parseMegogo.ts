@@ -286,5 +286,5 @@ export async function parseMegogo(url: string) {
 
   await browser.close();
 
-  return { pageTitle: '', results: [] };
+  return { pageTitle: '', results: {} };
 }

@@ -170,7 +170,22 @@ export async function parseMegogo(url: string) {
 
   // await new Promise(resolve => setTimeout(resolve, 5000));
 
-  const modals = await page.$$('div.modal');
+  const modals = await page.$$eval('div.modal', els =>
+    els.map(el => ({
+      text: el.innerText.trim(),
+      class: el.className,
+      // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
+    })),
+  );
+  // for (const modal of modals) {
+  //   const html = await modal.evaluate(el => el.outerHTML);
+  //   console.log(html);
+  // }
+  // for (const modal of modals) {
+  //   const text = await modal.evaluate(el => el.textContent);
+  //   console.log(text.trim());
+  // }
+
   console.log('🚀 ~ parseMegogo ~ modal:', modals);
 
   const divs = await page.$$eval('div', els =>

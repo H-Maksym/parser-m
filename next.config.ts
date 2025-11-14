@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   //   serverComponentsExternalPackages: ['puppeteer-core'],
   // },
   allowedDevOrigins: ['local-origin.dev', '*.local-origin.dev'],
+  output: 'standalone',
 };
 
 export default nextConfig;

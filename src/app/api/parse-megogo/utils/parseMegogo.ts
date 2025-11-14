@@ -4,14 +4,14 @@ import puppeteer from 'puppeteer-core';
 const isRemote =
   !!process.env.AWS_REGION ||
   !!process.env.VERCEL ||
-  !!process.env.IS_DOCKER ||
+  // !!process.env.IS_DOCKER ||
   !!process.env.IS_RENDER;
 
 export const launchBrowser = async () => {
   // const chromiumPack =
   //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
-  // const isDocker = !!process.env.IS_DOCKER;
+  const isDocker = !!process.env.IS_DOCKER;
 
   // const urlChromium = isRemote
   //   ? chromiumPack
@@ -39,24 +39,18 @@ export const launchBrowser = async () => {
       '🚀 ~ launchBrowser  -  Browser on server',
       await browser.version(),
     );
-    // } else if (isDocker) {
-    //   browser = await puppeteer.launch({
-    //     headless: true,
-    //     args: [
-    //       ...chromium.args,
-    //       '--no-sandbox',
-    //       '--disable-setuid-sandbox',
-    //       '--ignore-certificate-errors',
-    //       '--disable-blink-features=AutomationControlled',
-    //     ],
-    //     executablePath: await chromium.executablePath('/usr/bin/chromium'), // Sparticuz автоматично підбирає шлях
-    //     // executablePath: await chromium.executablePath(urlChromium ?? undefined),
-    //     defaultViewport: { width: 1366, height: 768 },
-    //   });
-    //   console.log(
-    //     '🚀 ~ launchBrowser  -  Browser on server',
-    //     await browser.version(),
-    //   );
+  } else if (isDocker) {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined, // Sparticuz автоматично підбирає шлях
+      // executablePath: await chromium.executablePath(urlChromium ?? undefined),
+      defaultViewport: { width: 1366, height: 768 },
+    });
+    console.log(
+      '🚀 ~ launchBrowser  -  Browser on server docker',
+      await browser.version(),
+    );
   } else {
     const puppeteerLocal = await import('puppeteer');
     browser = await puppeteerLocal.default.launch({

@@ -124,10 +124,10 @@ export async function parseMegogo(url: string) {
   }
 
   // // Встановлюємо User-Agent
-  await page.setUserAgent({
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  });
+  // await page.setUserAgent({
+  //   userAgent:
+  //     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  // });
 
   // Логування помилок
   page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
@@ -167,22 +167,20 @@ export async function parseMegogo(url: string) {
   // ); // повертає ElementHandle або null
   // console.log('🚀 ~ parseMegogo ~ consent:', consent);
 
+  const dialog = await page.$$eval('div[class*="popup"]', els =>
+    els.map(el => ({
+      text: el.innerText.trim(),
+      class: el.className,
+      html: el.outerHTML,
+    })),
+  ); // повертає ElementHandle або null
+  console.log('🚀 ~ parseMegogo ~ button:', dialog);
+
   const btn = await page.$('.btn.consent-button');
   if (btn) {
     const btnAge = await page.evaluate(el => el.outerHTML, btn);
     console.log(btnAge);
   }
-
-  // const dialog = await page.$$eval(
-  //   'button[class*=".btn.consent-button"]',
-  //   els =>
-  //     els.map(el => ({
-  //       text: el.innerText.trim(),
-  //       class: el.className,
-  //       html: el.outerHTML,
-  //     })),
-  // ); // повертає ElementHandle або null
-  // console.log('🚀 ~ parseMegogo ~ button:', dialog);
 
   // const elementsWithText = await page.$$eval('*', els => {
   //   return els

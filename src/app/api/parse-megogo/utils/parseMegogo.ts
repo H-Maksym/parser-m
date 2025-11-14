@@ -141,11 +141,13 @@ export async function parseMegogo(url: string) {
     timeout: 60000,
   });
 
+  await page.bringToFront();
   await page.evaluate(() => {
     window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
   });
 
   // Saves the PDF to pdfFileName.pdf.
+  await page.bringToFront();
   await page.pdf({
     path: 'pdfFileName.pdf',
   });

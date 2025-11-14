@@ -145,6 +145,11 @@ export async function parseMegogo(url: string) {
     window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
   });
 
+  // Saves the PDF to pdfFileName.pdf.
+  await page.pdf({
+    path: 'pdfFileName.pdf',
+  });
+
   // 🖼️ Зберігаємо скріншот у /tmp
   const screenshotFileName = `screenshotFileName.png`;
   const screenshotPath = isRemote
@@ -162,14 +167,22 @@ export async function parseMegogo(url: string) {
   // ); // повертає ElementHandle або null
   // console.log('🚀 ~ parseMegogo ~ consent:', consent);
 
-  // const dialog = await page.$$eval('div[class*="dialog"]', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     html: el.outerHTML,
-  //   })),
+  const btn = await page.$('.btn.consent-button');
+  if (btn) {
+    const btnAge = await page.evaluate(el => el.outerHTML, btn);
+    console.log(btnAge);
+  }
+
+  // const dialog = await page.$$eval(
+  //   'button[class*=".btn.consent-button"]',
+  //   els =>
+  //     els.map(el => ({
+  //       text: el.innerText.trim(),
+  //       class: el.className,
+  //       html: el.outerHTML,
+  //     })),
   // ); // повертає ElementHandle або null
-  // console.log('🚀 ~ parseMegogo ~ dialog:', dialog);
+  // console.log('🚀 ~ parseMegogo ~ button:', dialog);
 
   // const elementsWithText = await page.$$eval('*', els => {
   //   return els

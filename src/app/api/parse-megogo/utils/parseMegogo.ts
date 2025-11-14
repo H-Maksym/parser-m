@@ -171,21 +171,21 @@ export async function parseMegogo(url: string) {
   // ); // повертає ElementHandle або null
   // console.log('🚀 ~ parseMegogo ~ dialog:', dialog);
 
-  const elementsWithText = await page.$$eval('*', els => {
-    return els
-      .filter(
-        (el): el is HTMLElement =>
-          el instanceof HTMLElement && el.innerText.includes('Принять'),
-      )
-      .map(el => ({
-        tag: el.tagName,
-        text: el.innerText.trim(),
-        class: el.className,
-        html: el.outerHTML,
-      }));
-  });
+  // const elementsWithText = await page.$$eval('*', els => {
+  //   return els
+  //     .filter(
+  //       (el): el is HTMLElement =>
+  //         el instanceof HTMLElement && el.innerText.includes('Принять'),
+  //     )
+  //     .map(el => ({
+  //       tag: el.tagName,
+  //       text: el.innerText.trim(),
+  //       class: el.className,
+  //       html: el.outerHTML,
+  //     }));
+  // });
 
-  console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
+  // console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
 
   // const btn = await page.$$eval('button', els =>
   //   els.map(el => ({
@@ -205,15 +205,15 @@ export async function parseMegogo(url: string) {
   // await new Promise(resolve => setTimeout(resolve, 5000));
 
   //  Клікаємо по кнопці
-  const btnConsentAge = await page.evaluate(() => {
-    const btn = document.querySelector(
-      '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-    );
-    return btn ? btn.innerHTML : null;
-  });
-  console.log('🎬 btnAge:', btnConsentAge);
+  // const btnConsentAge = await page.evaluate(() => {
+  //   const btn = document.querySelector(
+  //     '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
+  //   );
+  //   return btn ? btn.innerHTML : null;
+  // });
+  // console.log('🎬 btnAge:', btnConsentAge);
 
-  if (btnConsentAge) {
+  if (!isRemote) {
     await page.click(
       '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
     );

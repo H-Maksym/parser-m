@@ -1,18 +1,17 @@
-import { list, put } from '@vercel/blob';
+import { put } from '@vercel/blob';
 import { isRemote, launchBrowser } from './puppeteer-config';
-import { sanitizeFileName } from './sanitizeFileName';
 
 export async function parseMegogo(url: string) {
   console.log('🚀🚀🚀 Launching parseMegogo');
 
-  try {
-    const cachedBlobResponse = await list();
-    cachedBlobResponse.blobs.map(blob => {
-      console.log('🚀 ~ parseMegogo ~ blob:', blob);
-    });
-  } catch (error) {
-    console.log('error cachedBlobResponse', error);
-  }
+  // try {
+  //   const cachedBlobResponse = await list();
+  //   cachedBlobResponse.blobs.map(blob => {
+  //     console.log('🚀 ~ parseMegogo ~ blob:', blob);
+  //   });
+  // } catch (error) {
+  //   console.log('error cachedBlobResponse', error);
+  // }
 
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
@@ -208,18 +207,18 @@ export async function parseMegogo(url: string) {
 
   await browser.close();
 
-  // Одразу кладемо в кеш
-  if (isRemote) {
-    await put(
-      `cache/parser-m/${sanitizeFileName(url)}`,
-      JSON.stringify({ pageTitle, results }),
-      {
-        access: 'public',
-        allowOverwrite: true,
-        contentType: 'application/json',
-      },
-    );
-  }
+  // // Одразу кладемо в кеш
+  // if (isRemote) {
+  //   await put(
+  //     `cache/parser-m/${sanitizeFileName(url)}`,
+  //     JSON.stringify({ pageTitle, results }),
+  //     {
+  //       access: 'public',
+  //       allowOverwrite: true,
+  //       contentType: 'application/json',
+  //     },
+  //   );
+  // }
   console.log('💾 Результат парсингу збережено в Blob Storage');
   // return { pageTitle: '', results: {} };
   return { pageTitle, results };

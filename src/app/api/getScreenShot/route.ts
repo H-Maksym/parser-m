@@ -4,7 +4,6 @@ import path from 'path';
 //https://parser-m.onrender.com/api/getScreenShot
 export async function GET() {
   const isProd = process.env.NODE_ENV === 'production';
-
   const screenshotPath = isProd
     ? // ? path.join('/tmp', 'screenshotFileName.png')
       path.join('/tmp', 'screenshotFileName.png')

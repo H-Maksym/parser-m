@@ -1,3 +1,4 @@
+import { put } from '@vercel/blob';
 import { getDeepText } from './getDeepModal';
 import { isRemote, launchBrowser } from './puppeteer-config';
 
@@ -129,7 +130,15 @@ export async function parseMegogo(url: string) {
     ? `/tmp/${screenshotFileName}`
     : `public/${screenshotFileName}`;
   await page.bringToFront();
-  await page.screenshot({ path: screenshotPath, fullPage: true });
+  const buffer = await page.screenshot({
+    path: screenshotPath,
+    fullPage: true,
+  });
+  //for Vercel
+  const nodeBuffer = Buffer.from(buffer);
+  await put(screenshotFileName, nodeBuffer, {
+    access: 'public', // зробить файл доступним за URL
+  });
 
   ////   Click on button
   // const btnConsentAge = await page.evaluate(() => {

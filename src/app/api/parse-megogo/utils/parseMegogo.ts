@@ -1,8 +1,17 @@
-import { put } from '@vercel/blob';
+import { list, put } from '@vercel/blob';
 import { isRemote, launchBrowser } from './puppeteer-config';
 
 export async function parseMegogo(url: string) {
   console.log('🚀🚀🚀 Launching parseMegogo');
+
+  try {
+    const cachedBlobResponse = await list();
+    cachedBlobResponse.blobs.map(blob => {
+      console.log('🚀 ~ parseMegogo ~ blob:', blob);
+    });
+  } catch (error) {
+    console.log('error cachedBlobResponse', error);
+  }
 
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
@@ -200,7 +209,7 @@ export async function parseMegogo(url: string) {
 
   // Одразу кладемо в кеш
   if (isRemote) {
-    await put(pageTitle, JSON.stringify({ pageTitle, results }), {
+    await put(`cache/parser-m/${url}`, JSON.stringify({ pageTitle, results }), {
       access: 'public',
       allowOverwrite: true,
       contentType: 'application/json',

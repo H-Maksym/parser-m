@@ -3,7 +3,7 @@ FROM node:22 AS builder
 
 ENV IS_DOCKER=true
 ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
-ENV NODE_ENV === 'production'
+# ENV NODE_ENV === 'production'
 
 # RUN pnpm dlx puppeteer browsers install chrome
 
@@ -72,7 +72,7 @@ FROM node:22 AS runner
 
 ENV IS_DOCKER=true
 ENV PUPPETEER_EXECUTABLE_PATH="/usr/local/bin/chromium"
-ENV NODE_ENV === 'production'
+# ENV NODE_ENV === 'production'
 
 # Встановлюємо Chromium + необхідні бібліотеки
 RUN apt-get update && apt-get install -y \

@@ -1,4 +1,3 @@
-import { getTopModalText } from './getTopModalText';
 import { isRemote, launchBrowser } from './puppeteer-config';
 
 export async function parseMegogo(url: string) {
@@ -119,16 +118,17 @@ export async function parseMegogo(url: string) {
   // const modalDeep = await getDeepText(page, modalSelector);
   // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
 
-  const modalTOP = await getTopModalText(page);
-  console.log('🚀 ~ parseMegogo ~ modalTOP:', modalTOP);
+  ///додати за наступним разом
+  // const modalTOP = await getTopModalText(page);
+  // console.log('🚀 ~ parseMegogo ~ modalTOP:', modalTOP);
 
-  //// 🖼️ Save screenshot to /tmp
-  // const screenshotFileName = `screenshotFileName.png`;
-  // const screenshotPath = isRemote
-  //   ? `/tmp/${screenshotFileName}`
-  //   : `public/${screenshotFileName}`;
-  // await page.bringToFront();
-  // await page.screenshot({ path: screenshotPath, fullPage: true });
+  // 🖼️ Save screenshot to /tmp
+  const screenshotFileName = `screenshotFileName.png`;
+  const screenshotPath = isRemote
+    ? `/tmp/${screenshotFileName}`
+    : `public/${screenshotFileName}`;
+  await page.bringToFront();
+  await page.screenshot({ path: screenshotPath, fullPage: true });
 
   ////   Click on button
   // const btnConsentAge = await page.evaluate(() => {

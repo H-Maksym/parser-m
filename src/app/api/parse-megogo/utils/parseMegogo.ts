@@ -153,18 +153,18 @@ export async function parseMegogo(url: string) {
   // });
 
   // Saves the PDF to pdfFileName.pdf.
-  await page.bringToFront();
-  await page.pdf({
-    path: 'pdfFileName.pdf',
-  });
-
-  // // 🖼️ Зберігаємо скріншот у /tmp
-  // const screenshotFileName = `screenshotFileName.png`;
-  // const screenshotPath = isRemote
-  //   ? `/tmp/${screenshotFileName}`
-  //   : `public/${screenshotFileName}`;
   // await page.bringToFront();
-  // await page.screenshot({ path: screenshotPath, fullPage: true });
+  // await page.pdf({
+  //   path: 'pdfFileName.pdf',
+  // });
+
+  // 🖼️ Зберігаємо скріншот у /tmp
+  const screenshotFileName = `screenshotFileName.png`;
+  const screenshotPath = isRemote
+    ? `/tmp/${screenshotFileName}`
+    : `public/${screenshotFileName}`;
+  await page.bringToFront();
+  await page.screenshot({ path: screenshotPath, fullPage: true });
 
   // const consent = await page.$$eval('div[class*="consent"]', els =>
   //   els.map(el => ({

@@ -1,5 +1,10 @@
 import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
+// import puppeteer from 'puppeteer-core';
+import type { LaunchOptions, Page } from 'puppeteer-core';
+// Type for Page
+export type PuppeteerPage = Page;
+let puppeteer: typeof import('puppeteer') | typeof import('puppeteer-core');
+// const isLocal = process.env.NODE_ENV !== 'production';
 
 export const isRemote =
   !!process.env.AWS_REGION ||
@@ -19,10 +24,12 @@ export const launchBrowser = async () => {
   //     ? '/usr/bin/chromium'
   //     : null;
 
-  let browser;
+  let options: LaunchOptions;
 
   if (isRemote) {
-    browser = await puppeteer.launch({
+    // Server puppeteer-core
+    puppeteer = require('puppeteer-core');
+    options = {
       headless: true,
       //added last for screen
       protocolTimeout: 180_000,
@@ -38,14 +45,11 @@ export const launchBrowser = async () => {
       executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
-    });
-    console.log(
-      '🚀 ~ launchBrowser  -  Browser on server',
-      await browser.version(),
-    );
+    };
   } else {
-    const puppeteerLocal = await import('puppeteer');
-    browser = await puppeteerLocal.default.launch({
+    // Local full puppeteer
+    puppeteer = require('puppeteer');
+    options = {
       headless: true,
       pipe: true,
       args: [
@@ -54,7 +58,20 @@ export const launchBrowser = async () => {
         '--disable-dev-shm-usage', // важливо для Render
       ],
       defaultViewport: { width: 1366, height: 768 },
-    });
+    };
+  }
+
+  let browser;
+
+  if (isRemote) {
+    browser = await puppeteer.launch(options);
+    console.log(
+      '🚀 ~ launchBrowser  -  Browser on server',
+      await browser.version(),
+    );
+  } else {
+    const puppeteerLocal = await import('puppeteer');
+    browser = await puppeteerLocal.default.launch();
     console.log('🚀 ~ launchBrowser  - Browser local', await browser.version());
   }
 

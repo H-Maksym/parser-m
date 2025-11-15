@@ -1,3 +1,4 @@
+import { getTopModalText } from './getTopModalText';
 import { isRemote, launchBrowser } from './puppeteer-config';
 
 export async function parseMegogo(url: string) {
@@ -107,16 +108,19 @@ export async function parseMegogo(url: string) {
   // );
   // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
 
-  await page.waitForSelector('body');
-  console.log('🚀 ~ parseMegogo ~ body:', await page.content());
+  // await page.waitForSelector('body');
+  // console.log('🚀 ~ parseMegogo ~ body:', await page.content());
 
   // await page.waitForSelector('body');
 
-  // const modalSelector = '#modal';
   // await page.waitForSelector(modalSelector, { visible: true });
 
+  // const modalSelector = '#modal';
   // const modalDeep = await getDeepText(page, modalSelector);
   // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
+
+  const modalTOP = await getTopModalText(page);
+  console.log('🚀 ~ parseMegogo ~ modalTOP:', modalTOP);
 
   //// 🖼️ Save screenshot to /tmp
   // const screenshotFileName = `screenshotFileName.png`;

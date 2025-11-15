@@ -9,9 +9,12 @@
     "googletagservices",
     "gstatic",
     "itemprop",
+    "KHTML",
     "Megogo",
     "mgid",
     "networkidle",
-    "prebid"
+    "prebid",
+    "requestfailed",
+    "sparticuz"
   ]
 }

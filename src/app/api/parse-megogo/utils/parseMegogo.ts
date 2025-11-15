@@ -1,5 +1,4 @@
 import { put } from '@vercel/blob';
-import { getDeepText } from './getDeepModal';
 import { isRemote, launchBrowser } from './puppeteer-config';
 
 export async function parseMegogo(url: string) {
@@ -49,50 +48,50 @@ export async function parseMegogo(url: string) {
   //   window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
   // });
 
-  const modal = await page.evaluate(() => {
-    const elements = Array.from(
-      document.querySelectorAll('*'),
-    ) as HTMLElement[];
+  // const modal = await page.evaluate(() => {
+  //   const elements = Array.from(
+  //     document.querySelectorAll('*'),
+  //   ) as HTMLElement[];
 
-    function isVisible(el: HTMLElement) {
-      const rect = el.getBoundingClientRect();
-      const style = getComputedStyle(el);
-      return (
-        rect.width > 0 &&
-        rect.height > 0 &&
-        style.display !== 'none' &&
-        style.visibility !== 'hidden' &&
-        style.opacity !== '0'
-      );
-    }
+  //   function isVisible(el: HTMLElement) {
+  //     const rect = el.getBoundingClientRect();
+  //     const style = getComputedStyle(el);
+  //     return (
+  //       rect.width > 0 &&
+  //       rect.height > 0 &&
+  //       style.display !== 'none' &&
+  //       style.visibility !== 'hidden' &&
+  //       style.opacity !== '0'
+  //     );
+  //   }
 
-    let best: { el: HTMLElement; score: number } | null = null;
+  //   let best: { el: HTMLElement; score: number } | null = null;
 
-    for (const el of elements) {
-      if (!isVisible(el)) continue;
+  //   for (const el of elements) {
+  //     if (!isVisible(el)) continue;
 
-      const style = getComputedStyle(el);
-      const rect = el.getBoundingClientRect();
+  //     const style = getComputedStyle(el);
+  //     const rect = el.getBoundingClientRect();
 
-      const z = parseInt(style.zIndex);
-      const isFixed = style.position === 'fixed';
-      const isCentered =
-        rect.left < window.innerWidth * 0.25 &&
-        rect.right > window.innerWidth * 0.75 &&
-        rect.top < window.innerHeight * 0.25 &&
-        rect.bottom > window.innerHeight * 0.75;
+  //     const z = parseInt(style.zIndex);
+  //     const isFixed = style.position === 'fixed';
+  //     const isCentered =
+  //       rect.left < window.innerWidth * 0.25 &&
+  //       rect.right > window.innerWidth * 0.75 &&
+  //       rect.top < window.innerHeight * 0.25 &&
+  //       rect.bottom > window.innerHeight * 0.75;
 
-      const score =
-        (isFixed ? 200 : 0) + (isCentered ? 500 : 0) + (isNaN(z) ? 0 : z);
+  //     const score =
+  //       (isFixed ? 200 : 0) + (isCentered ? 500 : 0) + (isNaN(z) ? 0 : z);
 
-      if (!best || score > best.score) {
-        best = { el, score };
-      }
-    }
+  //     if (!best || score > best.score) {
+  //       best = { el, score };
+  //     }
+  //   }
 
-    return best ? best.el.outerHTML : null;
-  });
-  console.log('🚀 ~ parseMegogo ~ modal:', modal);
+  //   return best ? best.el.outerHTML : null;
+  // });
+  // console.log('🚀 ~ parseMegogo ~ modal:', modal);
 
   // const topElement = await page.evaluate(() => {
   //   const x = window.innerWidth / 2;
@@ -103,11 +102,11 @@ export async function parseMegogo(url: string) {
   // });
   // console.log('topElement', topElement);
 
-  const modalDeep = await getDeepText(
-    page,
-    '.adl_cmp_consent-dialog-module_backdrop lang-ru',
-  );
-  console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
+  // const modalDeep = await getDeepText(
+  //   page,
+  //   '.adl_cmp_consent-dialog-module_backdrop lang-ru',
+  // );
+  // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
 
   // await page.waitForSelector('body');
   // console.log('🚀 ~ parseMegogo ~ body:', await page.content());

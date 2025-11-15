@@ -82,6 +82,12 @@ export const launchBrowser = async () => {
 
   await page.setBypassCSP(true);
 
+  // Логування помилок
+  page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
+  // page.on('requestfailed', req =>
+  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
+  // );
+
   // Логування реклами без блокування Megogo API
   page.on('requestfailed', req => {
     const url = req.url();

@@ -31,34 +31,11 @@ export async function parseMegogo(url: string) {
     });
   }
 
-  // // Встановлюємо User-Agent
-  // await page.setUserAgent({
-  //   userAgent:
-  //     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  // });
-
-  // Логування помилок
-  page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
-  // page.on('requestfailed', req =>
-  //   console.error('⚠️ Request failed:', req.url(), req.failure()),
-  // );
-
   // Завантаження сторінки з повним очікуванням
   const response = await page.goto(url, {
     waitUntil: 'networkidle2',
     timeout: 60000,
   });
-
-  // const bodyHTML = await page.evaluate(() => {
-  //   const btn = document.querySelector('body');
-  //   return btn ? btn.innerHTML : null;
-  // });
-  // console.log('🎬 btnAge:', bodyHTML);
-
-  // await page.bringToFront();
-  // await page.evaluate(() => {
-  //   window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
-  // });
 
   // Saves the PDF to pdfFileName.pdf.
   // await page.bringToFront();
@@ -66,102 +43,75 @@ export async function parseMegogo(url: string) {
   //   path: 'pdfFileName.pdf',
   // });
 
-  // Знайти модалку
-  // const topElement = await page.evaluate(() => {
-  //   const x = window.innerWidth / 2;
-  //   const y = window.innerHeight / 2;
-
-  //   const el = document.elementFromPoint(x, y);
-  //   return el ? el.outerHTML : null;
+  // await page.bringToFront();
+  // await page.evaluate(() => {
+  //   window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
   // });
-  // console.log('topElement', topElement);
 
-  // const largeZIndex = await page.evaluate(() => {
-  //   const elements = [...document.querySelectorAll('body *')];
+  // const modal = await page.evaluate(() => {
+  //   const elements = Array.from(
+  //     document.querySelectorAll('*'),
+  //   ) as HTMLElement[];
 
-  //   let maxZ = -Infinity;
-  //   let top = null;
+  //   function isVisible(el: HTMLElement) {
+  //     const rect = el.getBoundingClientRect();
+  //     const style = getComputedStyle(el);
+  //     return (
+  //       rect.width > 0 &&
+  //       rect.height > 0 &&
+  //       style.display !== 'none' &&
+  //       style.visibility !== 'hidden' &&
+  //       style.opacity !== '0'
+  //     );
+  //   }
+
+  //   let best: { el: HTMLElement; score: number } | null = null;
 
   //   for (const el of elements) {
-  //     const style = window.getComputedStyle(el);
-  //     const z = parseInt(style.zIndex);
+  //     if (!isVisible(el)) continue;
 
-  //     if (
-  //       !isNaN(z) &&
-  //       z > maxZ &&
-  //       style.display !== 'none' &&
-  //       style.visibility !== 'hidden'
-  //     ) {
-  //       maxZ = z;
-  //       top = el;
+  //     const style = getComputedStyle(el);
+  //     const rect = el.getBoundingClientRect();
+
+  //     const z = parseInt(style.zIndex);
+  //     const isFixed = style.position === 'fixed';
+  //     const isCentered =
+  //       rect.left < window.innerWidth * 0.25 &&
+  //       rect.right > window.innerWidth * 0.75 &&
+  //       rect.top < window.innerHeight * 0.25 &&
+  //       rect.bottom > window.innerHeight * 0.75;
+
+  //     const score =
+  //       (isFixed ? 200 : 0) + (isCentered ? 500 : 0) + (isNaN(z) ? 0 : z);
+
+  //     if (!best || score > best.score) {
+  //       best = { el, score };
   //     }
   //   }
 
-  //   return top ? top.outerHTML : null;
+  //   return best ? best.el.outerHTML : null;
   // });
+  // console.log('🚀 ~ parseMegogo ~ modal:', modal);
 
-  // console.log('largeZIndex', largeZIndex);
+  const topElement = await page.evaluate(() => {
+    const x = window.innerWidth / 2;
+    const y = window.innerHeight / 2;
 
-  // const modal = await page.evaluate(() => {
-  //   const elements = [...document.querySelectorAll('body *')];
-  //   const fixed = elements.filter(
-  //     el => getComputedStyle(el).position === 'fixed',
-  //   );
-  //   const last = fixed[fixed.length - 1];
-  //   return last ? last.outerHTML : null;
-  // });
-
-  // console.log('modal', modal);
-
-  const modal = await page.evaluate(() => {
-    const elements = Array.from(
-      document.querySelectorAll('*'),
-    ) as HTMLElement[];
-
-    function isVisible(el: HTMLElement) {
-      const rect = el.getBoundingClientRect();
-      const style = getComputedStyle(el);
-      return (
-        rect.width > 0 &&
-        rect.height > 0 &&
-        style.display !== 'none' &&
-        style.visibility !== 'hidden' &&
-        style.opacity !== '0'
-      );
-    }
-
-    let best: { el: HTMLElement; score: number } | null = null;
-
-    for (const el of elements) {
-      if (!isVisible(el)) continue;
-
-      const style = getComputedStyle(el);
-      const rect = el.getBoundingClientRect();
-
-      const z = parseInt(style.zIndex);
-      const isFixed = style.position === 'fixed';
-      const isCentered =
-        rect.left < window.innerWidth * 0.25 &&
-        rect.right > window.innerWidth * 0.75 &&
-        rect.top < window.innerHeight * 0.25 &&
-        rect.bottom > window.innerHeight * 0.75;
-
-      const score =
-        (isFixed ? 200 : 0) + (isCentered ? 500 : 0) + (isNaN(z) ? 0 : z);
-
-      if (!best || score > best.score) {
-        best = { el, score };
-      }
-    }
-
-    return best ? best.el.outerHTML : null;
+    const el = document.elementFromPoint(x, y);
+    return el ? el.outerHTML : null;
   });
-  console.log('🚀 ~ parseMegogo ~ modal:', modal);
+  console.log('topElement', topElement);
 
-  const modalDeep = await getDeepText(page, '#modal');
+  const modalDeep = await getDeepText(
+    page,
+    '.adl_cmp_consent-dialog-module_backdrop lang-ru',
+  );
   console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
 
-  // // 🖼️ Зберігаємо скріншот у /tmp
+  const modalDeep1 = await getDeepText(page, '.modal fade');
+  console.log('🚀 ~ parseMegogo ~ modal:', modalDeep1);
+
+  //// 🖼️ Save screenshot to /tmp
   // const screenshotFileName = `screenshotFileName.png`;
   // const screenshotPath = isRemote
   //   ? `/tmp/${screenshotFileName}`
@@ -169,59 +119,7 @@ export async function parseMegogo(url: string) {
   // await page.bringToFront();
   // await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  // const consent = await page.$$eval('div[class*="consent"]', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     html: el.outerHTML,
-  //   })),
-  // ); // повертає ElementHandle або null
-  // console.log('🚀 ~ parseMegogo ~ consent:', consent);
-
-  // const dialog = await page.$$eval('div[class*="popup"]', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     html: el.outerHTML,
-  //   })),
-  // ); // повертає ElementHandle або null
-  // console.log('🚀 ~ parseMegogo ~ button:', dialog);
-
-  // const elementsWithText = await page.$$eval('*', els => {
-  //   return els
-  //     .filter(
-  //       (el): el is HTMLElement =>
-  //         el instanceof HTMLElement && el.innerText.includes('Принять'),
-  //     )
-  //     .map(el => ({
-  //       tag: el.tagName,
-  //       text: el.innerText.trim(),
-  //       class: el.className,
-  //       html: el.outerHTML,
-  //     }));
-  // });
-  // console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
-
-  // console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
-
-  // const btn = await page.$$eval('button', els =>
-  //   els.map(el => ({
-  //     text: el.innerText.trim(),
-  //     class: el.className,
-  //     html: el.outerHTML,
-  //   })),
-  // ); // повертає ElementHandle або null
-  // console.log('🚀 ~ parseMegogo ~ btn:', btn);
-
-  // const bodyHTML = await page.$eval('body', el => el.innerText);
-  // console.log('🚀 ~ parseMegogo ~ bodyHTML:', bodyHTML);
-  //.scroll({    scrollLeft: 10,    scrollTop: 100,  });
-
-  // const html = await page.content();
-  // console.log('🚀 ~ parseMegogo ~ html:', html);
-  // await new Promise(resolve => setTimeout(resolve, 5000));
-
-  //  Клікаємо по кнопці
+  ////   Click on button
   // const btnConsentAge = await page.evaluate(() => {
   //   const btn = document.querySelector(
   //     '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',

@@ -22,77 +22,53 @@
 //   }
 // });
 
-// Прочитати кукіси
+// //Прочитати кукіси
 // const cookies = await browser.cookies();
 // console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 
-// const pageContents = await page.content();
-// console.log('🚀 ~ parseMegogo ~ pageContents:', pageContents);
+//// Find modal
+// const topElement = await page.evaluate(() => {
+//   const x = window.innerWidth / 2;
+//   const y = window.innerHeight / 2;
 
-// const pageFrames = await page.frames();
-// console.log('🚀 ~ parseMegogo ~ pageFrames:', pageFrames);
-
-// const searchText = 'Принять все';
-// const searchText2 = 'Принять только';
-
-// Знайти елементи
-// const elements = await page.waitForSelector('button, a, p, div, h1, h2, h3', {
-//   visible: true,
-//   hidden: true,
-//   timeout: 5000,
+//   const el = document.elementFromPoint(x, y);
+//   return el ? el.outerHTML : null;
 // });
+// console.log('topElement', topElement);
 
-// for (const el of elements) {
-//   const text = await page.evaluate(
-//     el => el.textContent.trim().toLowerCase(),
-//     el,
-//   );
-//   if (text.includes(searchText.trim().toLowerCase())) {
-//     // 🔍 тут умова пошуку по контенту
-//     const includesHtml = await page.evaluate(el => el.outerHTML, el);
-//     console.log('=== MATCH ===');
-//     console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml);
+// const largeZIndex = await page.evaluate(() => {
+//   const elements = [...document.querySelectorAll('body *')];
+
+//   let maxZ = -Infinity;
+//   let top = null;
+
+//   for (const el of elements) {
+//     const style = window.getComputedStyle(el);
+//     const z = parseInt(style.zIndex);
+
+//     if (
+//       !isNaN(z) &&
+//       z > maxZ &&
+//       style.display !== 'none' &&
+//       style.visibility !== 'hidden'
+//     ) {
+//       maxZ = z;
+//       top = el;
+//     }
 //   }
 
-//   if (text.includes(searchText2.trim().toLowerCase())) {
-//     // 🔍 тут умова пошуку по контенту
-//     const includesHtml2 = await page.evaluate(el => el.outerHTML, el);
-//     console.log('=== MATCH ===');
-//     console.log('🚀 ~ parseMegogo ~ includesHtml:', includesHtml2);
-//   }
-// }
-
-// await page.locator('body').scroll({
-//   scrollLeft: 10,
-//   scrollTop: 20,
+//   return top ? top.outerHTML : null;
 // });
 
-// try {
-//   const pdfFileName = `pdfFileName.pdf`;
-//   const pdfPath = isRemote ? `/tmp/${pdfFileName}` : `public/${pdfFileName}`;
-//   await page.pdf({
-//     path: pdfPath,
-//   });
-// } catch (error) {
-//   console.log('error in try-catch', error);
-// }
+// console.log('largeZIndex', largeZIndex);
 
-// Чекаємо поки кнопка з'явиться в DOM
-//   await page.waitForSelector(
-//     '.btn.type-white.consent-button.jsPopupConsent[data-element-code="continue"]',
-//     { timeout: 5000 },
+// const modal = await page.evaluate(() => {
+//   const elements = [...document.querySelectorAll('body *')];
+//   const fixed = elements.filter(
+//     el => getComputedStyle(el).position === 'fixed',
 //   );
+//   const last = fixed[fixed.length - 1];
+//   return last ? last.outerHTML : null;
+// });
 
-// const modals = await page.$$('div.modal');
-// console.log('🚀 ~ parseMegogo ~ modal:', modals);
-// const divs = await page.$$eval('div.modal', els =>
-//   els.map(el => ({
-//     text: el.innerText.trim(),
-//     class: el.className,
-//     // attrs: Array.from(el.attributes).map(a => [a.name, a.value]),
-//   })),
-// );
-// console.log('🚀 ~ parseMegogo ~ divs:', divs);
-
-// const html = await page.content();
-// console.log('🚀 ~ parseMegogo ~ html:', html);
+// console.log('modal', modal);

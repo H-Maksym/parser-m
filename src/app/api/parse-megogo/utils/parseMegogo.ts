@@ -95,6 +95,15 @@ export async function parseMegogo(url: string) {
       allowOverwrite: true, //rewrite
     });
   }
+
+  if (!response || !response.ok()) {
+    console.error(
+      'Failed to load the page:',
+      response ? response.status() : 'No response',
+    );
+  }
+  console.log('✅ Page loaded with status:', response?.status());
+
   ////   Click on button
   // const btnConsentAge = await page.evaluate(() => {
   //   const btn = document.querySelector(
@@ -109,14 +118,6 @@ export async function parseMegogo(url: string) {
       '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
     );
   }
-
-  if (!response || !response.ok()) {
-    console.error(
-      'Failed to load the page:',
-      response ? response.status() : 'No response',
-    );
-  }
-  console.log('✅ Page loaded with status:', response?.status());
 
   const pageTitle = await page.evaluate(() => {
     const h1 = document.querySelector('h1.video-title[itemprop="name"]');
@@ -197,6 +198,15 @@ export async function parseMegogo(url: string) {
 
   await browser.close();
 
+  // Одразу кладемо в кеш
+  if (isRemote) {
+    await put(pageTitle, JSON.stringify({ pageTitle, results }), {
+      access: 'public',
+      allowOverwrite: true,
+      contentType: 'application/json',
+    });
+  }
+  console.log('💾 Результат парсингу збережено в Blob Storage');
   // return { pageTitle: '', results: {} };
   return { pageTitle, results };
 }

@@ -92,6 +92,11 @@ export const launchBrowser = async () => {
       get: () => ['uk-UA', 'uk'],
     });
     Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
+    // Підміна data-geo для будь-якого елемента
+    document.addEventListener('DOMContentLoaded', () => {
+      const elements = document.querySelectorAll('[data-geo]');
+      elements.forEach(el => el.setAttribute('data-geo', 'ua'));
+    });
     console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
   });
 
@@ -99,10 +104,10 @@ export const launchBrowser = async () => {
     'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
   });
 
-  // Встановлення геолокації для сторінки (Київ)
-  const context = browser.defaultBrowserContext();
-  await context.overridePermissions('https://example.com', ['geolocation']); // заміни URL на потрібний сайт
-  await page.setGeolocation({ latitude: 50.4501, longitude: 30.5234 }); // Київ
+  // // Встановлення геолокації для сторінки (Київ)
+  // const context = browser.defaultBrowserContext();
+  // await context.overridePermissions('https://example.com', ['geolocation']); // заміни URL на потрібний сайт
+  // await page.setGeolocation({ latitude: 50.4501, longitude: 30.5234 }); // Київ
 
   await page.setBypassCSP(true);
 

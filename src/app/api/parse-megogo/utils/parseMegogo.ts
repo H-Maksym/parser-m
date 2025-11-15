@@ -1,5 +1,6 @@
 import { list, put } from '@vercel/blob';
 import { isRemote, launchBrowser } from './puppeteer-config';
+import { sanitizeFileName } from './sanitizeFileName';
 
 export async function parseMegogo(url: string) {
   console.log('🚀🚀🚀 Launching parseMegogo');
@@ -209,11 +210,15 @@ export async function parseMegogo(url: string) {
 
   // Одразу кладемо в кеш
   if (isRemote) {
-    await put(`cache/parser-m/${url}`, JSON.stringify({ pageTitle, results }), {
-      access: 'public',
-      allowOverwrite: true,
-      contentType: 'application/json',
-    });
+    await put(
+      `cache/parser-m/${sanitizeFileName(url)}`,
+      JSON.stringify({ pageTitle, results }),
+      {
+        access: 'public',
+        allowOverwrite: true,
+        contentType: 'application/json',
+      },
+    );
   }
   console.log('💾 Результат парсингу збережено в Blob Storage');
   // return { pageTitle: '', results: {} };

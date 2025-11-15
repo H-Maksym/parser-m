@@ -33,7 +33,10 @@ export async function parseMegogo(url: string) {
 
   // Переходимо на сервіс, який показує IP
   const data = await page.goto('https://api64.ipify.org?format=json');
-  console.log('Поточний IP:', data);
+  const content = await page.evaluate(() => document.body.innerHTML);
+  // парсимо JSON
+  // const data = JSON.parse(content);
+  console.log('Поточний IP:', content);
 
   // Завантаження сторінки з повним очікуванням
   const response = await page.goto(url, {
@@ -83,12 +86,13 @@ export async function parseMegogo(url: string) {
     fullPage: true,
   });
   //for Vercel
-  const nodeBuffer = Buffer.from(buffer);
-  await put(screenshotFileName, nodeBuffer, {
-    access: 'public', // зробить файл доступним за URL
-    allowOverwrite: true, //rewrite
-  });
-
+  if (isRemote) {
+    const nodeBuffer = Buffer.from(buffer);
+    await put(screenshotFileName, nodeBuffer, {
+      access: 'public', // зробить файл доступним за URL
+      allowOverwrite: true, //rewrite
+    });
+  }
   ////   Click on button
   // const btnConsentAge = await page.evaluate(() => {
   //   const btn = document.querySelector(

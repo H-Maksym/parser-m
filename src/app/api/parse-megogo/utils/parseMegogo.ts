@@ -1,4 +1,3 @@
-import { getDeepText } from './getDeepModal';
 import { isRemote, launchBrowser } from './puppeteer-config';
 
 export async function parseMegogo(url: string) {
@@ -93,23 +92,31 @@ export async function parseMegogo(url: string) {
   // });
   // console.log('🚀 ~ parseMegogo ~ modal:', modal);
 
-  const topElement = await page.evaluate(() => {
-    const x = window.innerWidth / 2;
-    const y = window.innerHeight / 2;
+  // const topElement = await page.evaluate(() => {
+  //   const x = window.innerWidth / 2;
+  //   const y = window.innerHeight / 2;
 
-    const el = document.elementFromPoint(x, y);
-    return el ? el.outerHTML : null;
-  });
-  console.log('topElement', topElement);
+  //   const el = document.elementFromPoint(x, y);
+  //   return el ? el.outerHTML : null;
+  // });
+  // console.log('topElement', topElement);
 
-  const modalDeep = await getDeepText(
-    page,
-    '.adl_cmp_consent-dialog-module_backdrop lang-ru',
-  );
-  console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
+  // const modalDeep = await getDeepText(
+  //   page,
+  //   '.adl_cmp_consent-dialog-module_backdrop lang-ru',
+  // );
+  // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
 
-  const modalDeep1 = await getDeepText(page, '.modal fade');
-  console.log('🚀 ~ parseMegogo ~ modal:', modalDeep1);
+  await page.waitForSelector('body');
+  console.log('🚀 ~ parseMegogo ~ body:', await page.content());
+
+  // await page.waitForSelector('body');
+
+  // const modalSelector = '#modal';
+  // await page.waitForSelector(modalSelector, { visible: true });
+
+  // const modalDeep = await getDeepText(page, modalSelector);
+  // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
 
   //// 🖼️ Save screenshot to /tmp
   // const screenshotFileName = `screenshotFileName.png`;

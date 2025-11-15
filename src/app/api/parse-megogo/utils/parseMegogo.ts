@@ -32,10 +32,10 @@ export async function parseMegogo(url: string) {
   }
 
   // Переходимо на сервіс, який показує IP
-  const data = await page.goto('https://api64.ipify.org?format=json');
-  const content = await page.evaluate(() => document.body.innerHTML);
-  // парсимо JSON
+  await page.goto('https://api64.ipify.org?format=json');
+  // parsing JSON
   // const data = JSON.parse(content);
+  const content = await page.evaluate(() => document.body.innerHTML);
   console.log('Поточний IP:', content);
 
   // Завантаження сторінки з повним очікуванням
@@ -43,6 +43,7 @@ export async function parseMegogo(url: string) {
     waitUntil: 'networkidle2',
     timeout: 60000,
   });
+  console.log('🚀 ~ parseMegogo ~ response:', response);
 
   // Saves the PDF to pdfFileName.pdf.
   // await page.bringToFront();

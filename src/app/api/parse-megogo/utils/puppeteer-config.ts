@@ -42,6 +42,7 @@ export const launchBrowser = async () => {
         '--disable-setuid-sandbox',
         '--ignore-certificate-errors',
         '--disable-blink-features=AutomationControlled',
+        '--disable-dev-shm-usage', // важливо для Render
         `--proxy-server=${proxy}`,
       ],
       // executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
@@ -57,7 +58,7 @@ export const launchBrowser = async () => {
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage', // важливо для Render
+        `--proxy-server=${proxy}`,
       ],
       defaultViewport: { width: 1366, height: 768 },
     };

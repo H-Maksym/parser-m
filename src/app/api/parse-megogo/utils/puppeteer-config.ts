@@ -28,7 +28,7 @@ export const launchBrowser = async () => {
 
   if (isRemote) {
     // Server puppeteer-core
-    puppeteer = require('puppeteer-core');
+    puppeteer = await import('puppeteer-core');
     options = {
       headless: true,
       //added last for screen
@@ -49,7 +49,7 @@ export const launchBrowser = async () => {
     };
   } else {
     // Local full puppeteer
-    puppeteer = require('puppeteer');
+    puppeteer = await import('puppeteer');
     options = {
       headless: true,
       pipe: true,

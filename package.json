@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "node .next/standalone/server.js",
+    "start": "next start",
     "lint": "eslint",
     "install-chrome": "puppeteer browsers install chrome",
     "parse:megogo": "tsx scripts/parse-megogo.ts"

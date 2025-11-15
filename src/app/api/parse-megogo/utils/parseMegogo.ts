@@ -138,6 +138,7 @@ export async function parseMegogo(url: string) {
   const nodeBuffer = Buffer.from(buffer);
   await put(screenshotFileName, nodeBuffer, {
     access: 'public', // зробить файл доступним за URL
+    allowOverwrite: true, //rewrite
   });
 
   ////   Click on button

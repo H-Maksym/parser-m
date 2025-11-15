@@ -46,8 +46,8 @@ export async function parseMegogo(url: string) {
 
   // parsing JSON
   // const data = JSON.parse(content);
-  const content = await page.evaluate(() => document.body.innerHTML);
-  console.log('Поточний IP:', content);
+  // const content = await page.evaluate(() => document.body.innerHTML);
+  // console.log('Поточний IP:', content);
 
   // Завантаження сторінки з повним очікуванням
   const response = await page.goto(url, {

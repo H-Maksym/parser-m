@@ -31,6 +31,11 @@ export async function parseMegogo(url: string) {
     });
   }
 
+  // Переходимо на сервіс, який показує IP
+  await page.goto('https://api64.ipify.org?format=json');
+  const content = await page.evaluate(() => document.body.innerText);
+  console.log('Поточний IP:', content);
+
   // Завантаження сторінки з повним очікуванням
   const response = await page.goto(url, {
     waitUntil: 'networkidle2',

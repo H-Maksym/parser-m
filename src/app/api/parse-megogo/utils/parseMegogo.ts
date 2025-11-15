@@ -27,7 +27,7 @@ export const launchBrowser = async () => {
       //added last for screen
       protocolTimeout: 180_000,
       protocol: 'cdp',
-      pipe: true,
+      // pipe: true,
       args: [
         ...chromium.args,
         '--no-sandbox',
@@ -141,6 +141,12 @@ export async function parseMegogo(url: string) {
     timeout: 60000,
   });
 
+  const bodyHTML = await page.evaluate(() => {
+    const btn = document.querySelector('body');
+    return btn ? btn.innerHTML : null;
+  });
+  console.log('🎬 btnAge:', bodyHTML);
+
   // await page.bringToFront();
   // await page.evaluate(() => {
   //   window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
@@ -178,20 +184,20 @@ export async function parseMegogo(url: string) {
   // ); // повертає ElementHandle або null
   // console.log('🚀 ~ parseMegogo ~ button:', dialog);
 
-  const elementsWithText = await page.$$eval('*', els => {
-    return els
-      .filter(
-        (el): el is HTMLElement =>
-          el instanceof HTMLElement && el.innerText.includes('Принять'),
-      )
-      .map(el => ({
-        tag: el.tagName,
-        text: el.innerText.trim(),
-        class: el.className,
-        html: el.outerHTML,
-      }));
-  });
-  console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
+  // const elementsWithText = await page.$$eval('*', els => {
+  //   return els
+  //     .filter(
+  //       (el): el is HTMLElement =>
+  //         el instanceof HTMLElement && el.innerText.includes('Принять'),
+  //     )
+  //     .map(el => ({
+  //       tag: el.tagName,
+  //       text: el.innerText.trim(),
+  //       class: el.className,
+  //       html: el.outerHTML,
+  //     }));
+  // });
+  // console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
 
   // console.log('🚀 ~ parseMegogo ~ elementsWithText:', elementsWithText);
 

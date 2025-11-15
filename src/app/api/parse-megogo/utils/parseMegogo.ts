@@ -158,13 +158,59 @@ export async function parseMegogo(url: string) {
   //   path: 'pdfFileName.pdf',
   // });
 
-  // 🖼️ Зберігаємо скріншот у /tmp
-  const screenshotFileName = `screenshotFileName.png`;
-  const screenshotPath = isRemote
-    ? `/tmp/${screenshotFileName}`
-    : `public/${screenshotFileName}`;
-  await page.bringToFront();
-  await page.screenshot({ path: screenshotPath, fullPage: true });
+  const topElement = await page.evaluate(() => {
+    const x = window.innerWidth / 2;
+    const y = window.innerHeight / 2;
+
+    const el = document.elementFromPoint(x, y);
+    return el ? el.outerHTML : null;
+  });
+
+  console.log('topElement', topElement);
+
+  const largeZIndex = await page.evaluate(() => {
+    const elements = [...document.querySelectorAll('body *')];
+
+    let maxZ = -Infinity;
+    let top = null;
+
+    for (const el of elements) {
+      const style = window.getComputedStyle(el);
+      const z = parseInt(style.zIndex);
+
+      if (
+        !isNaN(z) &&
+        z > maxZ &&
+        style.display !== 'none' &&
+        style.visibility !== 'hidden'
+      ) {
+        maxZ = z;
+        top = el;
+      }
+    }
+
+    return top ? top.outerHTML : null;
+  });
+
+  console.log('largeZIndex', largeZIndex);
+
+  const modal = await page.evaluate(() => {
+    const elements = [...document.querySelectorAll('body *')];
+    const fixed = elements.filter(
+      el => getComputedStyle(el).position === 'fixed',
+    );
+    const last = fixed[fixed.length - 1];
+    return last ? last.outerHTML : null;
+  });
+
+  console.log('modal', modal);
+  // // 🖼️ Зберігаємо скріншот у /tmp
+  // const screenshotFileName = `screenshotFileName.png`;
+  // const screenshotPath = isRemote
+  //   ? `/tmp/${screenshotFileName}`
+  //   : `public/${screenshotFileName}`;
+  // await page.bringToFront();
+  // await page.screenshot({ path: screenshotPath, fullPage: true });
 
   // const consent = await page.$$eval('div[class*="consent"]', els =>
   //   els.map(el => ({

@@ -4,7 +4,11 @@ import path from 'path';
 
 // https://parser-m.onrender.com/api/getScreenShot
 export async function GET() {
-  const pdfFileName = path.join('/tmp', 'pdfFileName.pdf');
+  const isProd = process.env.NODE_ENV === 'production';
+
+  const pdfFileName = isProd
+    ? path.join('/tmp', 'pdfFileName.pdf')
+    : path.join(process.cwd(), 'public', 'pdfFileName.pdf');
 
   // Check if the file exists
   if (!fs.existsSync(pdfFileName)) {

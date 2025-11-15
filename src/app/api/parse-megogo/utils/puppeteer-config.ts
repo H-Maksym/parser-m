@@ -4,7 +4,7 @@ import type { LaunchOptions, Page } from 'puppeteer-core';
 // Type for Page
 export type PuppeteerPage = Page;
 let puppeteer: typeof import('puppeteer') | typeof import('puppeteer-core');
-const proxy = process.env.PROXY || '91.238.104.172:20';
+const proxy = process.env.PROXY || '91.238.104.172:2024';
 
 export const isRemote =
   !!process.env.AWS_REGION ||

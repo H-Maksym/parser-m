@@ -43,7 +43,7 @@ export async function parseMegogo(url: string) {
     waitUntil: 'networkidle2',
     timeout: 60000,
   });
-  console.log('🚀 ~ parseMegogo ~ response:', response);
+  console.log('🚀 ~ parseMegogo ~ response:', await response?.content());
 
   // Saves the PDF to pdfFileName.pdf.
   // await page.bringToFront();

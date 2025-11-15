@@ -95,23 +95,14 @@ export const launchBrowser = async () => {
     console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
   });
 
-  // Заміна всіх data-geo на "ua"
-  await page.evaluate(() => {
-    const elements = document.querySelectorAll('[data-geo]');
-    elements.forEach(el => el.setAttribute('data-geo', 'ua'));
-  });
-
-  // Перевірка
-  const geoValues = await page.evaluate(() => {
-    return Array.from(document.querySelectorAll('[data-geo]')).map(el =>
-      el.getAttribute('data-geo'),
-    );
-  });
-  console.log('🚀 ~ launchBrowser ~ geoValues:', geoValues);
-
   await page.setExtraHTTPHeaders({
     'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
   });
+
+  // Встановлення геолокації для сторінки (Київ)
+  const context = browser.defaultBrowserContext();
+  await context.overridePermissions('https://example.com', ['geolocation']); // заміни URL на потрібний сайт
+  await page.setGeolocation({ latitude: 50.4501, longitude: 30.5234 }); // Київ
 
   await page.setBypassCSP(true);
 

@@ -8,7 +8,7 @@ const proxy = process.env.PROXY || '45.80.111.91:80';
 
 export const isRemote =
   !!process.env.AWS_REGION ||
-  !!process.env.VERCEL ||
+  !!process.env.IS_VERCEL ||
   !!process.env.IS_DOCKER ||
   !!process.env.IS_RENDER;
 

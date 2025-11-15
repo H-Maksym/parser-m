@@ -1,97 +1,5 @@
-import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
-
-const isRemote =
-  !!process.env.AWS_REGION ||
-  !!process.env.VERCEL ||
-  !!process.env.IS_DOCKER ||
-  !!process.env.IS_RENDER;
-
-export const launchBrowser = async () => {
-  // const chromiumPack =
-  //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
-
-  // const isDocker = !!process.env.IS_DOCKER;
-
-  // const urlChromium = isRemote
-  //   ? chromiumPack
-  //   : isDocker
-  //     ? '/usr/bin/chromium'
-  //     : null;
-
-  let browser;
-
-  if (isRemote) {
-    browser = await puppeteer.launch({
-      headless: true,
-      //added last for screen
-      protocolTimeout: 180_000,
-      protocol: 'cdp',
-      // pipe: true,
-      args: [
-        ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--ignore-certificate-errors',
-        '--disable-blink-features=AutomationControlled',
-      ],
-      executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
-      // executablePath: await chromium.executablePath(urlChromium ?? undefined),
-      defaultViewport: { width: 1366, height: 768 },
-    });
-    console.log(
-      '🚀 ~ launchBrowser  -  Browser on server',
-      await browser.version(),
-    );
-  } else {
-    const puppeteerLocal = await import('puppeteer');
-    browser = await puppeteerLocal.default.launch({
-      headless: true,
-      pipe: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage', // важливо для Render
-      ],
-      defaultViewport: { width: 1366, height: 768 },
-    });
-    console.log('🚀 ~ launchBrowser  - Browser local', await browser.version());
-  }
-
-  const page = await browser.newPage();
-
-  await page.setUserAgent({
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  });
-
-  await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-    // @ts-expect-error mock chrome.runtime for tests
-    window.chrome = { runtime: {} };
-    Object.defineProperty(navigator, 'languages', {
-      get: () => ['uk-UA', 'uk'],
-    });
-    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
-    console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
-  });
-
-  await page.setExtraHTTPHeaders({
-    'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
-  });
-
-  await page.setBypassCSP(true);
-
-  // Логування реклами без блокування Megogo API
-  page.on('requestfailed', req => {
-    const url = req.url();
-    if (url.includes('ads.') || url.includes('doubleclick')) {
-      console.log('❌ Blocked ad:', url);
-    }
-  });
-
-  return { browser, page };
-};
+import { getDeepText } from './getDeepModal';
+import { isRemote, launchBrowser } from './puppeteer-config';
 
 export async function parseMegogo(url: string) {
   console.log('🚀🚀🚀 Launching parseMegogo');
@@ -158,52 +66,101 @@ export async function parseMegogo(url: string) {
   //   path: 'pdfFileName.pdf',
   // });
 
-  const topElement = await page.evaluate(() => {
-    const x = window.innerWidth / 2;
-    const y = window.innerHeight / 2;
+  // Знайти модалку
+  // const topElement = await page.evaluate(() => {
+  //   const x = window.innerWidth / 2;
+  //   const y = window.innerHeight / 2;
 
-    const el = document.elementFromPoint(x, y);
-    return el ? el.outerHTML : null;
-  });
+  //   const el = document.elementFromPoint(x, y);
+  //   return el ? el.outerHTML : null;
+  // });
+  // console.log('topElement', topElement);
 
-  console.log('topElement', topElement);
+  // const largeZIndex = await page.evaluate(() => {
+  //   const elements = [...document.querySelectorAll('body *')];
 
-  const largeZIndex = await page.evaluate(() => {
-    const elements = [...document.querySelectorAll('body *')];
+  //   let maxZ = -Infinity;
+  //   let top = null;
 
-    let maxZ = -Infinity;
-    let top = null;
+  //   for (const el of elements) {
+  //     const style = window.getComputedStyle(el);
+  //     const z = parseInt(style.zIndex);
+
+  //     if (
+  //       !isNaN(z) &&
+  //       z > maxZ &&
+  //       style.display !== 'none' &&
+  //       style.visibility !== 'hidden'
+  //     ) {
+  //       maxZ = z;
+  //       top = el;
+  //     }
+  //   }
+
+  //   return top ? top.outerHTML : null;
+  // });
+
+  // console.log('largeZIndex', largeZIndex);
+
+  // const modal = await page.evaluate(() => {
+  //   const elements = [...document.querySelectorAll('body *')];
+  //   const fixed = elements.filter(
+  //     el => getComputedStyle(el).position === 'fixed',
+  //   );
+  //   const last = fixed[fixed.length - 1];
+  //   return last ? last.outerHTML : null;
+  // });
+
+  // console.log('modal', modal);
+
+  const modal = await page.evaluate(() => {
+    const elements = Array.from(
+      document.querySelectorAll('*'),
+    ) as HTMLElement[];
+
+    function isVisible(el: HTMLElement) {
+      const rect = el.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      return (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        style.opacity !== '0'
+      );
+    }
+
+    let best: { el: HTMLElement; score: number } | null = null;
 
     for (const el of elements) {
-      const style = window.getComputedStyle(el);
-      const z = parseInt(style.zIndex);
+      if (!isVisible(el)) continue;
 
-      if (
-        !isNaN(z) &&
-        z > maxZ &&
-        style.display !== 'none' &&
-        style.visibility !== 'hidden'
-      ) {
-        maxZ = z;
-        top = el;
+      const style = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+
+      const z = parseInt(style.zIndex);
+      const isFixed = style.position === 'fixed';
+      const isCentered =
+        rect.left < window.innerWidth * 0.25 &&
+        rect.right > window.innerWidth * 0.75 &&
+        rect.top < window.innerHeight * 0.25 &&
+        rect.bottom > window.innerHeight * 0.75;
+
+      const score =
+        (isFixed ? 200 : 0) + (isCentered ? 500 : 0) + (isNaN(z) ? 0 : z);
+
+      if (!best || score > best.score) {
+        best = { el, score };
       }
     }
 
-    return top ? top.outerHTML : null;
+    return best ? best.el.outerHTML : null;
   });
+  console.log('🚀 ~ parseMegogo ~ modal:', modal);
 
-  console.log('largeZIndex', largeZIndex);
+  const modalDeep = await getDeepText(page, '#modal');
+  console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
 
-  const modal = await page.evaluate(() => {
-    const elements = [...document.querySelectorAll('body *')];
-    const fixed = elements.filter(
-      el => getComputedStyle(el).position === 'fixed',
-    );
-    const last = fixed[fixed.length - 1];
-    return last ? last.outerHTML : null;
-  });
-
-  console.log('modal', modal);
   // // 🖼️ Зберігаємо скріншот у /tmp
   // const screenshotFileName = `screenshotFileName.png`;
   // const screenshotPath = isRemote

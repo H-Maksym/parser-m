@@ -6,7 +6,8 @@ export async function GET() {
   const isProd = process.env.NODE_ENV === 'production';
 
   const screenshotPath = isProd
-    ? path.join('/tmp', 'screenshotFileName.png')
+    ? // ? path.join('/tmp', 'screenshotFileName.png')
+      path.join('/public', 'screenshotFileName.png')
     : path.join(process.cwd(), 'public', 'screenshotFileName.png');
 
   if (!fs.existsSync(screenshotPath)) {

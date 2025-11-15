@@ -1,3 +1,4 @@
+import { getDeepText } from './getDeepModal';
 import { isRemote, launchBrowser } from './puppeteer-config';
 
 export async function parseMegogo(url: string) {
@@ -92,20 +93,20 @@ export async function parseMegogo(url: string) {
   // });
   // console.log('🚀 ~ parseMegogo ~ modal:', modal);
 
-  // const topElement = await page.evaluate(() => {
-  //   const x = window.innerWidth / 2;
-  //   const y = window.innerHeight / 2;
+  const topElement = await page.evaluate(() => {
+    const x = window.innerWidth / 2;
+    const y = window.innerHeight / 2;
 
-  //   const el = document.elementFromPoint(x, y);
-  //   return el ? el.outerHTML : null;
-  // });
-  // console.log('topElement', topElement);
+    const el = document.elementFromPoint(x, y);
+    return el ? el.outerHTML : null;
+  });
+  console.log('topElement', topElement);
 
-  // const modalDeep = await getDeepText(
-  //   page,
-  //   '.adl_cmp_consent-dialog-module_backdrop lang-ru',
-  // );
-  // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
+  const modalDeep = await getDeepText(
+    page,
+    '.adl_cmp_consent-dialog-module_backdrop lang-ru',
+  );
+  console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
 
   // await page.waitForSelector('body');
   // console.log('🚀 ~ parseMegogo ~ body:', await page.content());

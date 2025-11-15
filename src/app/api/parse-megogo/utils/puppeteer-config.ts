@@ -41,7 +41,7 @@ export const launchBrowser = async () => {
         '--disable-setuid-sandbox',
         '--ignore-certificate-errors',
         '--disable-blink-features=AutomationControlled',
-        '--proxy-server=91.238.105.64:2024',
+        '--proxy-server=91.202.14.20:8080',
       ],
       executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
       // executablePath: await chromium.executablePath(urlChromium ?? undefined),

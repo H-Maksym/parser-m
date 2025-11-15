@@ -13,12 +13,13 @@ export const isRemote =
   !!process.env.IS_RENDER;
 
 export const launchBrowser = async () => {
-  // const chromiumPack =
-  //   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
+  const chromiumPack =
+    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
 
   // const isDocker = !!process.env.IS_DOCKER;
 
-  // const urlChromium = isRemote
+  const urlChromium =
+    isRemote || process.env.IS_VERCEL ? chromiumPack : undefined;
   //   ? chromiumPack
   //   : isDocker
   //     ? '/usr/bin/chromium'
@@ -43,8 +44,8 @@ export const launchBrowser = async () => {
         '--disable-blink-features=AutomationControlled',
         `--proxy-server=${proxy}`,
       ],
-      executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
-      // executablePath: await chromium.executablePath(urlChromium ?? undefined),
+      // executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
+      executablePath: await chromium.executablePath(urlChromium ?? undefined),
       defaultViewport: { width: 1366, height: 768 },
     };
   } else {

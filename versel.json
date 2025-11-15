@@ -4,6 +4,14 @@
       "NODE_ENV": "production"
     }
   },
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": [
+        "node_modules/@sparticuz/chromium/bin/**",
+        "node_modules/@sparticuz/chromium/build/**"
+      ]
+    }
+  },
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs"

@@ -141,22 +141,22 @@ export async function parseMegogo(url: string) {
     timeout: 60000,
   });
 
-  const bodyHTML = await page.evaluate(() => {
-    const btn = document.querySelector('body');
-    return btn ? btn.innerHTML : null;
-  });
-  console.log('🎬 btnAge:', bodyHTML);
+  // const bodyHTML = await page.evaluate(() => {
+  //   const btn = document.querySelector('body');
+  //   return btn ? btn.innerHTML : null;
+  // });
+  // console.log('🎬 btnAge:', bodyHTML);
 
   // await page.bringToFront();
   // await page.evaluate(() => {
   //   window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
   // });
 
-  // // Saves the PDF to pdfFileName.pdf.
-  // await page.bringToFront();
-  // await page.pdf({
-  //   path: 'pdfFileName.pdf',
-  // });
+  // Saves the PDF to pdfFileName.pdf.
+  await page.bringToFront();
+  await page.pdf({
+    path: 'pdfFileName.pdf',
+  });
 
   // // 🖼️ Зберігаємо скріншот у /tmp
   // const screenshotFileName = `screenshotFileName.png`;

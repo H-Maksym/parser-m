@@ -32,7 +32,9 @@ export async function parseMegogo(url: string) {
   }
 
   // Переходимо на сервіс, який показує IP
-  await page.goto('https://api64.ipify.org?format=json');
+  const api64 = await page.goto('https://api64.ipify.org?format=json');
+  console.log('🚀 ~ parseMegogo ~ api64:', api64);
+
   // parsing JSON
   // const data = JSON.parse(content);
   const content = await page.evaluate(() => document.body.innerHTML);

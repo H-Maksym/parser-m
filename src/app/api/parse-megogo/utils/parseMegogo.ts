@@ -32,10 +32,7 @@ export async function parseMegogo(url: string) {
   }
 
   // Переходимо на сервіс, який показує IP
-  await page.goto('https://api64.ipify.org?format=json');
-  const content = await page.evaluate(() => document.body.innerText);
-  // парсимо JSON
-  const data = JSON.parse(content);
+  const data = await page.goto('https://api64.ipify.org?format=json');
   console.log('Поточний IP:', data);
 
   // Завантаження сторінки з повним очікуванням

@@ -4,7 +4,7 @@ import type { LaunchOptions, Page } from 'puppeteer-core';
 // Type for Page
 export type PuppeteerPage = Page;
 let puppeteer: typeof import('puppeteer') | typeof import('puppeteer-core');
-// const proxy = process.env.PROXY || '45.80.111.91:80';
+const proxy = process.env.PROXY || '51.158.54.217:80';
 
 export const isRemote =
   !!process.env.AWS_REGION ||
@@ -42,7 +42,7 @@ export const launchBrowser = async () => {
         '--disable-setuid-sandbox',
         '--ignore-certificate-errors',
         '--disable-blink-features=AutomationControlled',
-        // `--proxy-server=${proxy}`,
+        `--proxy-server=${proxy}`,
       ],
       // executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
       executablePath: await chromium.executablePath(urlChromium ?? undefined),

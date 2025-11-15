@@ -48,80 +48,25 @@ export async function parseMegogo(url: string) {
   //   window.scrollBy(0, 1000); // -1500 прокручує вверх, 1500 вниз
   // });
 
-  // const modal = await page.evaluate(() => {
-  //   const elements = Array.from(
-  //     document.querySelectorAll('*'),
-  //   ) as HTMLElement[];
+  // Ждем контейнер диалога
+  // await page.waitForSelector('.adl_cmp_consent-dialog-module_backdrop');
 
-  //   function isVisible(el: HTMLElement) {
-  //     const rect = el.getBoundingClientRect();
-  //     const style = getComputedStyle(el);
-  //     return (
-  //       rect.width > 0 &&
-  //       rect.height > 0 &&
-  //       style.display !== 'none' &&
-  //       style.visibility !== 'hidden' &&
-  //       style.opacity !== '0'
-  //     );
-  //   }
-
-  //   let best: { el: HTMLElement; score: number } | null = null;
-
-  //   for (const el of elements) {
-  //     if (!isVisible(el)) continue;
-
-  //     const style = getComputedStyle(el);
-  //     const rect = el.getBoundingClientRect();
-
-  //     const z = parseInt(style.zIndex);
-  //     const isFixed = style.position === 'fixed';
-  //     const isCentered =
-  //       rect.left < window.innerWidth * 0.25 &&
-  //       rect.right > window.innerWidth * 0.75 &&
-  //       rect.top < window.innerHeight * 0.25 &&
-  //       rect.bottom > window.innerHeight * 0.75;
-
-  //     const score =
-  //       (isFixed ? 200 : 0) + (isCentered ? 500 : 0) + (isNaN(z) ? 0 : z);
-
-  //     if (!best || score > best.score) {
-  //       best = { el, score };
-  //     }
-  //   }
-
-  //   return best ? best.el.outerHTML : null;
+  // // Достаем shadow root и кнопку по тексту
+  // const acceptAllButton = await page.evaluateHandle(() => {
+  //   const backdrop = document.querySelector(
+  //     '.adl_cmp_consent-dialog-module_backdrop',
+  //   );
+  //   const shadowRoot =
+  //     backdrop.shadowRoot || backdrop.querySelector('template').content;
+  //   const buttons = shadowRoot.querySelectorAll('button.buttonEl');
+  //   // Ищем кнопку по точному тексту
+  //   return Array.from(buttons).find(
+  //     btn => btn.textContent.trim() === 'Принять все',
+  //   );
   // });
-  // console.log('🚀 ~ parseMegogo ~ modal:', modal);
 
-  // const topElement = await page.evaluate(() => {
-  //   const x = window.innerWidth / 2;
-  //   const y = window.innerHeight / 2;
-
-  //   const el = document.elementFromPoint(x, y);
-  //   return el ? el.outerHTML : null;
-  // });
-  // console.log('topElement', topElement);
-
-  // const modalDeep = await getDeepText(
-  //   page,
-  //   '.adl_cmp_consent-dialog-module_backdrop lang-ru',
-  // );
-  // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
-
-  // await page.waitForSelector('body');
-  // console.log('🚀 ~ parseMegogo ~ body:', await page.content());
-
-  // await page.waitForSelector('body');
-
-  // await page.waitForSelector(modalSelector, { visible: true });
-
-  // const modalSelector = '#modal';
-  // const modalDeep = await getDeepText(page, modalSelector);
-  // console.log('🚀 ~ parseMegogo ~ modal:', modalDeep);
-
-  ///додати за наступним разом
-  // const modalTOP = await getTopModalText(page);
-  // console.log('🚀 ~ parseMegogo ~ modalTOP:', modalTOP);
+  // // Кликаем по кнопке
+  // await acceptAllButton.click();
 
   // 🖼️ Save screenshot to /tmp
   const screenshotFileName = `screenshotFileName.png`;

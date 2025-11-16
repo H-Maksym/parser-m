@@ -1,6 +1,6 @@
 import chromium from '@sparticuz/chromium';
 import type { LaunchOptions, Page } from 'puppeteer-core';
-import { IS_REMOTE, PROXY, URL_CHROMIUM_PACK } from '../const';
+import { IS_REMOTE, PROXY } from '../const';
 // Type for Page
 export type PuppeteerPage = Page;
 let puppeteer: typeof import('puppeteer') | typeof import('puppeteer-core');
@@ -24,10 +24,10 @@ export async function launchBrowser() {
         '--disable-dev-shm-usage', // важливо для Render
         `--proxy-server=${PROXY}`,
       ],
-      // executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
-      executablePath: await chromium.executablePath(
-        URL_CHROMIUM_PACK ?? undefined,
-      ),
+      executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
+      // executablePath: await chromium.executablePath(
+      //   URL_CHROMIUM_PACK ?? undefined,
+      // ),
       defaultViewport: { width: 1366, height: 768 },
     };
   } else {

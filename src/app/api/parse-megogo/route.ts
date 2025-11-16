@@ -1,19 +1,20 @@
+import { BlobAccessError } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
+import { VERCEL_BLOB_CACHE_PATH } from './const';
 import {
   generateCSV,
   generateExcel,
+  getVercelCache,
   parseMegogo,
-  sanitizeFileName,
-} from './utils';
+  putVercelCache,
+} from './services';
+import { ParserMegogoData } from './types';
+import { sanitizeFileName } from './utils';
 
 export async function POST(req: NextRequest) {
   try {
-    // Отримуємо формат з query string (?format=csv або ?format=json)
-    const { searchParams } = new URL(req.url);
-    const format = searchParams.get('format') || 'json';
-
+    //Get url from form
     const { url } = await req.json();
-
     if (!url || typeof url !== 'string') {
       return NextResponse.json(
         { error: 'Missing or invalid URL' },
@@ -21,11 +22,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Виконуємо парсинг (твоя функція)
-    const { pageTitle, results } = await parseMegogo(url);
+    // Get format  by query string (?format=csv або ?format=json)
+    const { searchParams } = new URL(req.url);
+    const format = searchParams.get('format') || 'json';
+
+    //Check cache from VercelBlob
+    const saveFileName = sanitizeFileName(url).replace('.html', '.json');
+    console.log('🚀 ~ POST ~ saveFileName:', saveFileName);
+    let data: ParserMegogoData;
+    const cacheResult = await getVercelCache(saveFileName, 100 * 60 * 1000);
+    if (cacheResult) {
+      data = cacheResult;
+      console.log('🚀 ~ Returning cached data.');
+    } else {
+      data = await parseMegogo(url);
+      await putVercelCache(`${VERCEL_BLOB_CACHE_PATH + saveFileName}`, data);
+    }
+
+    const { pageTitle, results } = data;
 
     if (format === 'csv') {
-      const csv = generateCSV(pageTitle ?? '', results);
+      const csv = generateCSV(data);
       const safeFileName = sanitizeFileName(pageTitle || 'episodes');
       const encodedFileName = encodeURIComponent(safeFileName); //для кирилиці
 
@@ -34,7 +51,7 @@ export async function POST(req: NextRequest) {
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
           'Content-Disposition': `attachment; filename="episodes.csv"; filename*=UTF-8''${encodedFileName}.csv`,
-          // додатково можна додати:
+          // can be additionally added:
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           Pragma: 'no-cache',
           Expires: '0',
@@ -43,7 +60,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (format === 'excel') {
-      const excelBuffer = generateExcel(pageTitle ?? '', results);
+      const excelBuffer = generateExcel(data);
       const safeFileName = sanitizeFileName(pageTitle || 'episodes');
       const encodedFileName = encodeURIComponent(safeFileName); //для кирилиці
 
@@ -60,10 +77,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Якщо format не csv, повертаємо JSON + скріншот
     return NextResponse.json({
-      // screenshotPath,
-      // screenshot: `data:image/png;base64,${screenshotBase64}`,
       pageTitle,
       totalSeasons: Object.keys(results).length,
       data: results,
@@ -71,6 +85,14 @@ export async function POST(req: NextRequest) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    //Handling errors from Vercel
+    if (error instanceof BlobAccessError) {
+      console.log('error from Vercel Blob');
+    } else {
+      // throw the error again if it's unknown
+      throw error;
+    }
+
     return NextResponse.json(
       { error: error.message || 'Internal Server Error' },
       { status: 500 },

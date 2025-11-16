@@ -1,10 +1,10 @@
-import type { PuppeteerPage } from './puppeteer-config';
+import { PuppeteerPage } from '../../config';
 
 export async function getTopModalText(
   page: PuppeteerPage,
 ): Promise<string | null> {
   return await page.evaluate(() => {
-    // Рекурсивно отримуємо текст елемента та shadow DOM
+    // recursively get the text of the element and the shadow DOM
     function extractText(el: HTMLElement): string {
       let text = '';
 
@@ -15,10 +15,10 @@ export async function getTopModalText(
         text += getShadowText(shadowRoot);
       }
 
-      // Текст самого елемента
+      // The text of the element itself
       text += el.innerText ? el.innerText + '\n' : '';
 
-      // Діти
+      // Children
       const children = Array.from(el.children) as HTMLElement[];
       for (const child of children) {
         text += extractText(child);
@@ -38,12 +38,12 @@ export async function getTopModalText(
       return text;
     }
 
-    // Збираємо всі елементи
+    // collect all the elements
     const allElements = Array.from(
       document.body.querySelectorAll<HTMLElement>('*'),
     );
 
-    // Фільтруємо видимі
+    // filter the visible ones
     const visibleElements = allElements.filter(el => {
       const style = window.getComputedStyle(el);
       return (
@@ -54,7 +54,7 @@ export async function getTopModalText(
       );
     });
 
-    // Сортуємо по z-index (найвище зверху)
+    // Sort by z-index (highest on top)
     visibleElements.sort((a, b) => {
       const zA = parseInt(window.getComputedStyle(a).zIndex || '0', 10);
       const zB = parseInt(window.getComputedStyle(b).zIndex || '0', 10);

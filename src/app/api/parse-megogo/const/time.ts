@@ -1,0 +1,5 @@
+// time constants
+
+export const MILLISECONDS_IN_SECOND = 1000;
+export const SECONDS_IN_MINUTE = 60;
+export const DEFAULT_TIMEOUT = 5 * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;

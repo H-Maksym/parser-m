@@ -24,10 +24,10 @@ export async function getDeepText(
         text += getShadowText(shadowRoot);
       }
 
-      // текст елемента
+      // element text
       text += el.innerText ? el.innerText + '\n' : '';
 
-      // рекурсія по дітях
+      // recursion over children
       const children = Array.from(el.children) as HTMLElement[];
       for (const child of children) text += extract(child);
 

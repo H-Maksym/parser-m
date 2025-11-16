@@ -1,0 +1,50 @@
+import { VERCEL_BLOB_CACHE_PATH, VERCEL_BLOB_PATH } from '../../const';
+
+/**
+ * Download cache from Vercel Blob Storage
+ * @param fileName - name or url to cache file
+ * @param maxAgeMs - (not necessary) max age cache in seconds
+ * @returns object JSON or null, if cache absent / outstanding / not valid
+ */
+export async function getVercelCache(fileName: string, maxAgeMs?: number) {
+  //TODO забрати в константу
+  const url = VERCEL_BLOB_PATH + VERCEL_BLOB_CACHE_PATH + fileName;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.warn(
+        'File not found or the server returned an error:',
+        response.status,
+      );
+      return null;
+    }
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.warn("The file exists, but it's not JSON.");
+      return null;
+    }
+
+    // If you need to check the cache date
+    if (maxAgeMs) {
+      const lastModified = response.headers.get('last-modified');
+      console.log('🚀 ~ fetchVercelCache ~ lastModified:', lastModified);
+      if (lastModified) {
+        const modifiedTime = new Date(lastModified).getTime();
+        const now = Date.now();
+        if (now - modifiedTime > maxAgeMs) {
+          console.log('Cash has expired.');
+          return null;
+        }
+      }
+    }
+
+    const data = await response.json();
+    return data; // { pageTitle, results }
+  } catch (error) {
+    console.error('Error getting cache:', error);
+    return null;
+  }
+}

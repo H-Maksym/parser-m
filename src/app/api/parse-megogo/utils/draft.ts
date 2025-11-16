@@ -22,7 +22,7 @@
 //   }
 // });
 
-// //Прочитати кукіси
+// //Прочитати cookies
 // const cookies = await browser.cookies();
 // console.log('🚀 ~ parseMegogo ~ cookies:', cookies);
 

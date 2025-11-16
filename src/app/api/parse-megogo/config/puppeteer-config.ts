@@ -1,41 +1,20 @@
 import chromium from '@sparticuz/chromium';
-// import puppeteer from 'puppeteer-core';
 import type { LaunchOptions, Page } from 'puppeteer-core';
+import { IS_REMOTE, PROXY, URL_CHROMIUM_PACK } from '../const';
 // Type for Page
 export type PuppeteerPage = Page;
 let puppeteer: typeof import('puppeteer') | typeof import('puppeteer-core');
-const proxy = process.env.PROXY || '91.238.104.172:2024';
 
-export const isRemote =
-  !!process.env.AWS_REGION ||
-  !!process.env.IS_VERCEL ||
-  !!process.env.IS_DOCKER ||
-  !!process.env.IS_RENDER;
-
-export const launchBrowser = async () => {
-  const chromiumPack =
-    'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';
-
-  // const isDocker = !!process.env.IS_DOCKER;
-
-  const urlChromium =
-    isRemote || process.env.IS_VERCEL ? chromiumPack : undefined;
-  //   ? chromiumPack
-  //   : isDocker
-  //     ? '/usr/bin/chromium'
-  //     : null;
-
+export async function launchBrowser() {
   let options: LaunchOptions;
 
-  if (isRemote) {
+  if (IS_REMOTE) {
     // Server puppeteer-core
     puppeteer = await import('puppeteer-core');
     options = {
       headless: true,
-      //added last for screen
       protocolTimeout: 180_000,
       protocol: 'cdp',
-      // pipe: true,
       args: [
         ...chromium.args,
         '--no-sandbox',
@@ -43,10 +22,12 @@ export const launchBrowser = async () => {
         '--ignore-certificate-errors',
         '--disable-blink-features=AutomationControlled',
         '--disable-dev-shm-usage', // важливо для Render
-        `--proxy-server=${proxy}`,
+        `--proxy-server=${PROXY}`,
       ],
       // executablePath: await chromium.executablePath(), // Sparticuz автоматично підбирає шлях
-      executablePath: await chromium.executablePath(urlChromium ?? undefined),
+      executablePath: await chromium.executablePath(
+        URL_CHROMIUM_PACK ?? undefined,
+      ),
       defaultViewport: { width: 1366, height: 768 },
     };
   } else {
@@ -58,15 +39,16 @@ export const launchBrowser = async () => {
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        `--proxy-server=${proxy}`,
+        `--proxy-server=${PROXY}`,
       ],
+
       defaultViewport: { width: 1366, height: 768 },
     };
   }
 
   let browser;
 
-  if (isRemote) {
+  if (IS_REMOTE) {
     browser = await puppeteer.launch(options);
     console.log(
       '🚀 ~ launchBrowser  -  Browser on server',
@@ -112,13 +94,13 @@ export const launchBrowser = async () => {
 
   await page.setBypassCSP(true);
 
-  // Логування помилок
+  // Error logging
   page.on('pageerror', err => console.error('❌ PAGE ERROR:', err));
   // page.on('requestfailed', req =>
   //   console.error('⚠️ Request failed:', req.url(), req.failure()),
   // );
 
-  // Логування реклами без блокування Megogo API
+  // Ad logging without Megogo API blocking
   page.on('requestfailed', req => {
     const url = req.url();
     if (url.includes('ads.') || url.includes('doubleclick')) {
@@ -127,4 +109,4 @@ export const launchBrowser = async () => {
   });
 
   return { browser, page };
-};
+}

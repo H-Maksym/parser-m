@@ -1,21 +1,18 @@
 import { put } from '@vercel/blob';
-import { isRemote, launchBrowser } from './puppeteer-config';
+import { launchBrowser } from '../config';
+import {
+  IS_REMOTE,
+  IS_VERCEL,
+  SCREENSHOT_FILE_NAME,
+  VERCEL_BLOB_CACHE_IMAGES_PATH,
+} from '../const';
 
 export async function parseMegogo(url: string) {
   console.log('🚀🚀🚀 Launching parseMegogo');
 
-  // try {
-  //   const cachedBlobResponse = await list();
-  //   cachedBlobResponse.blobs.map(blob => {
-  //     console.log('🚀 ~ parseMegogo ~ blob:', blob);
-  //   });
-  // } catch (error) {
-  //   console.log('error cachedBlobResponse', error);
-  // }
-
   const { browser, page } = await launchBrowser();
   // Блокуємо аналітику, рекламу, трекери
-  if (!isRemote) {
+  if (!IS_REMOTE) {
     await page.setRequestInterception(true);
     page.on('request', req => {
       const url = req.url();
@@ -87,23 +84,23 @@ export async function parseMegogo(url: string) {
   // await acceptAllButton.click();
 
   // 🖼️ Save screenshot to /tmp
-  const screenshotFileName = `screenshotFileName.png`;
-  const screenshotPath = isRemote
-    ? `/tmp/${screenshotFileName}`
-    : `public/${screenshotFileName}`;
+  const screenshotPath =
+    IS_REMOTE && !IS_VERCEL
+      ? `/tmp/${SCREENSHOT_FILE_NAME}`
+      : `public/${SCREENSHOT_FILE_NAME}`;
+
   await page.bringToFront();
   const buffer = await page.screenshot({
     path: screenshotPath,
     fullPage: true,
   });
-  //for Vercel
-  if (isRemote) {
-    const nodeBuffer = Buffer.from(buffer);
-    await put(screenshotFileName, nodeBuffer, {
-      access: 'public', // зробить файл доступним за URL
-      allowOverwrite: true, //rewrite
-    });
-  }
+
+  //Put to VercelBlob
+  const nodeBuffer = Buffer.from(buffer);
+  await put(VERCEL_BLOB_CACHE_IMAGES_PATH + SCREENSHOT_FILE_NAME, nodeBuffer, {
+    access: 'public', // make the file available by URL
+    allowOverwrite: true, //rewrite
+  });
 
   if (!response || !response.ok()) {
     console.error(
@@ -113,16 +110,7 @@ export async function parseMegogo(url: string) {
   }
   console.log('✅ Page loaded with status:', response?.status());
 
-  ////   Click on button
-  // const btnConsentAge = await page.evaluate(() => {
-  //   const btn = document.querySelector(
-  //     '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
-  //   );
-  //   return btn ? btn.innerHTML : null;
-  // });
-  // console.log('🎬 btnAge:', btnConsentAge);
-
-  if (!isRemote) {
+  if (!IS_REMOTE) {
     await page.click(
       '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
     );
@@ -219,7 +207,7 @@ export async function parseMegogo(url: string) {
   //     },
   //   );
   // }
-  console.log('💾 Результат парсингу збережено в Blob Storage');
+  // console.log('💾 Результат парсингу збережено в Blob Storage');
   // return { pageTitle: '', results: {} };
   return { pageTitle, results };
 }

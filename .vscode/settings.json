@@ -13,8 +13,11 @@
     "Megogo",
     "mgid",
     "networkidle",
+    "officedocument",
+    "openxmlformats",
     "prebid",
     "requestfailed",
-    "sparticuz"
+    "sparticuz",
+    "spreadsheetml"
   ]
 }

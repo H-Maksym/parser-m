@@ -14,7 +14,7 @@ export async function getVercelCache(fileName: string, maxAgeMs?: number) {
     const response = await fetch(url);
     console.log('🚀 ~ getVercelCache ~ response:', response);
 
-    if (!response.bodyUsed) {
+    if (!response.ok) {
       console.warn(
         'File not found or the server returned an error:',
         response.status,

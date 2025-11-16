@@ -1,4 +1,4 @@
-import { VERCEL_BLOB_CACHE_PATH, VERCEL_BLOB_PATH } from '../../const';
+import { BLOB_URL, VERCEL_BLOB_CACHE_PATH } from '../../const';
 
 /**
  * Download cache from Vercel Blob Storage
@@ -8,10 +8,12 @@ import { VERCEL_BLOB_CACHE_PATH, VERCEL_BLOB_PATH } from '../../const';
  */
 export async function getVercelCache(fileName: string, maxAgeMs?: number) {
   //TODO забрати в константу
-  const url = VERCEL_BLOB_PATH + VERCEL_BLOB_CACHE_PATH + fileName;
+  const url = BLOB_URL + VERCEL_BLOB_CACHE_PATH + fileName;
+  console.log('🚀 ~ getVercelCache ~ url:', url);
 
   try {
     const response = await fetch(url);
+    console.log('🚀 ~ getVercelCache ~ response:', response);
 
     if (!response.ok) {
       console.warn(

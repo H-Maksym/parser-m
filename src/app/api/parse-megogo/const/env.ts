@@ -1,11 +1,11 @@
 // clean process.env variables
 
 //Vercel Blob
-export const BLOB_URL = process.env.BLOB_URL;
-export const BLOB_READ_WRITE_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
-export const VERCEL_BLOB_PATH =
-  process.env.VERCEL_BLOB_PATH ||
+export const BLOB_URL =
+  process.env.BLOB_URL ||
   'https://aq5lxyx2aehguhrq.public.blob.vercel-storage.com/';
+
+export const BLOB_READ_WRITE_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 export const VERCEL_BLOB_CACHE_PATH =
   process.env.VERCEL_BLOB_CACHE_PATH || 'cache/parser-m/';
 export const VERCEL_BLOB_CACHE_IMAGES_PATH =

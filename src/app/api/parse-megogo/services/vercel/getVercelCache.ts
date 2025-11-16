@@ -9,13 +9,12 @@ import { BLOB_URL, VERCEL_BLOB_CACHE_PATH } from '../../const';
 export async function getVercelCache(fileName: string, maxAgeMs?: number) {
   //TODO забрати в константу
   const url = BLOB_URL + VERCEL_BLOB_CACHE_PATH + fileName;
-  console.log('🚀 ~ getVercelCache ~ url:', url);
 
   try {
     const response = await fetch(url);
     console.log('🚀 ~ getVercelCache ~ response:', response);
 
-    if (!response.ok) {
+    if (!response.bodyUsed) {
       console.warn(
         'File not found or the server returned an error:',
         response.status,

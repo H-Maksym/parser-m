@@ -18,4 +18,4 @@ export const IS_DOCKER = process.env.IS_DOCKER;
 export const IS_RENDER = process.env.IS_RENDER;
 
 //imitate ukraine fetch
-export const PROXY = process.env.PROXY || '91.238.104.172:2024';
+export const PROXY = process.env.PROXY || '159.224.232.194:8888';

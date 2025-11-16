@@ -43,16 +43,16 @@ export async function getVercelCache(fileName: string, maxAgeMs?: number) {
       }
     }
 
-    // const data = await response.json();
     // SAFE JSON PARSING
-    let data;
-    data = await response.text();
 
-    if (!data) {
+    const resData = await response.text();
+
+    if (!resData) {
       console.warn('Cache file is empty.');
       throw new Error();
     }
 
+    const data = await response.json();
     return data; // { pageTitle, results }
   } catch (error) {
     console.error('Error getting cache:', error);

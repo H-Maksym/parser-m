@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     console.log('🚀 ~ POST ~ saveFileName:', saveFileName);
     let data: ParserMegogoData;
     const cacheResult = await getVercelCache(saveFileName, 100 * 60 * 1000);
+    console.log('🚀 ~ POST ~ cacheResult:', cacheResult);
     if (cacheResult) {
       data = cacheResult;
       console.log('🚀 ~ Returning cached data.');

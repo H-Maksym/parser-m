@@ -2,11 +2,11 @@ import fs from 'fs';
 import { NextResponse } from 'next/server';
 import path from 'path';
 import {
+  BLOB_URL,
   IS_DOCKER,
   IS_REMOTE,
   SCREENSHOT_FILE_NAME,
   VERCEL_BLOB_CACHE_IMAGES_PATH,
-  VERCEL_BLOB_PATH,
 } from '../parse-megogo/const';
 
 export async function GET() {
@@ -14,7 +14,7 @@ export async function GET() {
 
   if (IS_REMOTE && !IS_DOCKER) {
     screenshotPath =
-      VERCEL_BLOB_PATH + VERCEL_BLOB_CACHE_IMAGES_PATH + SCREENSHOT_FILE_NAME;
+      BLOB_URL + VERCEL_BLOB_CACHE_IMAGES_PATH + SCREENSHOT_FILE_NAME;
 
     // Download file
     const blobRes = await fetch(screenshotPath);

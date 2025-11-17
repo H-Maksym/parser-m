@@ -15,12 +15,14 @@ import {
   putVercelCache,
 } from './services';
 import { ParserMegogoData } from './types';
-import { sanitizeFileName } from './utils';
+import { cleanUrl, sanitizeFileName } from './utils';
 
 export async function POST(req: NextRequest) {
   try {
     //Get url from form
-    const { url } = await req.json();
+    const { url: fullURL } = await req.json();
+    const url = cleanUrl(fullURL);
+
     if (!url || typeof url !== 'string') {
       return NextResponse.json(
         { error: 'Missing or invalid URL' },
@@ -42,10 +44,6 @@ export async function POST(req: NextRequest) {
     data = await memoryCache.cached(saveFileName, CACHE_EXPIRATION_TIME, () =>
       parseMegogo(url),
     );
-    console.log('🚀 ~ POST ~ memoryCache.cached:', data);
-
-    const getCache = await memoryCache.get(saveFileName);
-    console.log('🚀 ~ POST ~memoryCache.get:', getCache);
 
     if (IS_VERCEL) {
       const cacheResult = await getVercelCache(saveFileName, 100 * 60 * 1000);

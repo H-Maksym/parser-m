@@ -6,7 +6,7 @@ import {
   SCREENSHOT_FILE_NAME,
   VERCEL_BLOB_CACHE_IMAGES_PATH,
 } from '../const';
-import { Results } from '../types';
+import { ParserMegogoData, Results } from '../types';
 import { extractHtmlName } from '../utils';
 
 export async function parseMegogo(url: string) {
@@ -125,10 +125,7 @@ export async function parseMegogo(url: string) {
   console.log('🎬 Title:', pageTitle);
 
   // почекати вручну, якщо треба
-  await new Promise(resolve => setTimeout(resolve, 5000));
-
-  await page.waitForSelector('ul.seasons-list');
-  console.log('🚀 ~ parseMegogo ~ page:', page);
+  // await new Promise(resolve => setTimeout(resolve, 5000));
 
   const seasons = await page.$$eval('ul.seasons-list li a', links =>
     links.map(a => ({
@@ -139,7 +136,24 @@ export async function parseMegogo(url: string) {
         : '',
     })),
   );
-  console.log('🚀 ~ parseMegogo ~ seasons:', seasons);
+
+  if (!seasons.length) {
+    // logic for the case without seasons
+    const data: ParserMegogoData = {
+      pageTitle,
+      results: {
+        [pageTitle]: [
+          {
+            title: pageTitle,
+            url,
+            fileName: extractHtmlName(url),
+          },
+        ],
+      },
+    };
+    await browser.close();
+    return data;
+  }
 
   const results: Results = {};
 
@@ -207,20 +221,5 @@ export async function parseMegogo(url: string) {
   console.log('✅ Close browser:');
 
   await browser.close();
-
-  // // Одразу кладемо в кеш
-  // if (isRemote) {
-  //   await put(
-  //     `cache/parser-m/${sanitizeFileName(url)}`,
-  //     JSON.stringify({ pageTitle, results }),
-  //     {
-  //       access: 'public',
-  //       allowOverwrite: true,
-  //       contentType: 'application/json',
-  //     },
-  //   );
-  // }
-  // console.log('💾 Результат парсингу збережено в Blob Storage');
-  // return { pageTitle: '', results: {} };
   return { pageTitle, results };
 }

@@ -1,4 +1,5 @@
 import { put, type PutBlobResult, type PutCommandOptions } from '@vercel/blob';
+import { Results } from '../../types';
 /**
  * Writes data to cache on Vercel Blob Storage *
  * @param fileName — cache file name or path
@@ -9,15 +10,7 @@ import { put, type PutBlobResult, type PutCommandOptions } from '@vercel/blob';
  *     - cache Control Max Age: max-age for cache control,
  *     - content Type: content type (default application/json)*/
 
-//TODO перенести типи в одне місце
-// Тип одного елемента всередині сезону
-interface Episode {
-  title: string;
-  url: string;
-}
-
 // Тип об’єкта results: ключ — назва сезону (string), значення — масив епізодів
-type Results = Record<string, Episode[]>;
 
 export async function putVercelCache(
   fileName: string,
@@ -34,7 +27,7 @@ export async function putVercelCache(
   const putOptions = {
     access: options?.access ?? 'public',
     allowOverwrite: options?.allowOverwrite ?? true,
-    cacheControlMaxAge: options?.cacheControlMaxAge ?? 60 * 60, // 1 hour by default (in seconds)
+    cacheControlMaxAge: options?.cacheControlMaxAge ?? 0, // 1 hour by default (in seconds)
     contentType: options?.contentType ?? 'application/json',
   };
 

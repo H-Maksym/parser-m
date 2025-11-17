@@ -5,7 +5,7 @@ export type Episode = {
   url: string;
 };
 
-type Results = Record<string, Episode[]>;
+export type Results = Record<string, Episode[]>;
 
 export type ParserMegogoData = {
   pageTitle: string;

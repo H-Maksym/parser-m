@@ -4,7 +4,7 @@ import { IS_VERCEL, MILLISECONDS_IN_SECOND } from './index';
 
 export const SCREENSHOT_FILE_NAME = `screenshotFileName.png`;
 
-export const CACHE_EXPIRATION_TIME = 60 * 60 * MILLISECONDS_IN_SECOND; //
+export const CACHE_EXPIRATION_TIME = 10 * 60 * MILLISECONDS_IN_SECOND; //
 
 const CHROMIUM_PACK_PATH =
   'https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar';

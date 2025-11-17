@@ -11,10 +11,10 @@ export async function getVercelCache(fileName: string, maxAgeMs?: number) {
   const url = BLOB_URL + VERCEL_BLOB_CACHE_PATH + fileName;
 
   try {
-    //давай попрацюємо над цим з NEXTJS app роутер та  Швидкий серверний кеш → In-Memory або Redis.
+    //давай попрацюємо над отриманням з кешу з NEXTJS app роутер з In-Memory або Redis.
     const response = await fetch(url, {
-      // cache: 'no-store',
-      cache: 'force-cache', // спробувати взяти з кеша, якщо є
+      cache: 'no-cache',
+      // cache: 'force-cache', // спробувати взяти з кеша, якщо є
 
       // /*fixed cache for Vercel*/ {
       //   cache: 'no-store',

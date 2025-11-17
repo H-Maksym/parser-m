@@ -181,9 +181,12 @@ export async function parseMegogo(url: string) {
                 ?.getAttribute('data-episode-title') ||
               '';
             const href = card.querySelector('a')?.getAttribute('href') ?? '';
+            const url = href ? new URL(href, window.location.origin).href : '';
+            // const fileName = extractHtmlName(url);
             return {
               title,
-              url: href ? new URL(href, window.location.origin).href : '',
+              url,
+              // fileName,
             };
           })
           .filter(e => e.title && e.url),

@@ -3,6 +3,7 @@
 export type Episode = {
   title: string;
   url: string;
+  fileName: string;
 };
 
 export type Results = Record<string, Episode[]>;

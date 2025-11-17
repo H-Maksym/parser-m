@@ -1,6 +1,11 @@
 import { BlobAccessError } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
-import { VERCEL_BLOB_CACHE_PATH } from './const';
+import {
+  CACHE_EXPIRATION_TIME,
+  IS_VERCEL,
+  VERCEL_BLOB_CACHE_PATH,
+} from './const';
+import { memoryCache } from './infrastructure/performance/lib';
 import {
   generateCSV,
   generateExcel,
@@ -29,15 +34,28 @@ export async function POST(req: NextRequest) {
     //Check cache from VercelBlob
     const saveFileName = sanitizeFileName(url).replace('.html', '.json');
     console.log('🚀 ~ POST ~ saveFileName:', saveFileName);
+
     let data: ParserMegogoData;
-    const cacheResult = await getVercelCache(saveFileName, 100 * 60 * 1000);
-    console.log('🚀 ~ POST ~ cacheResult:', cacheResult);
-    if (cacheResult) {
-      data = cacheResult;
-      console.log('🚀 ~ Returning cached data.');
-    } else {
-      data = await parseMegogo(url);
-      await putVercelCache(`${VERCEL_BLOB_CACHE_PATH + saveFileName}`, data);
+
+    data = await memoryCache.cached(saveFileName, CACHE_EXPIRATION_TIME, () =>
+      parseMegogo(url),
+    );
+    console.log('🚀 ~ POST ~ memoryCache.cached:', data);
+
+    //loging
+    const getCache = await memoryCache.get(saveFileName);
+    console.log('🚀 ~ POST ~memoryCache.get:', getCache);
+
+    if (IS_VERCEL) {
+      const cacheResult = await getVercelCache(saveFileName, 100 * 60 * 1000);
+      console.log('🚀 ~ POST ~ cacheResult:', cacheResult);
+      if (cacheResult) {
+        data = cacheResult;
+        console.log('🚀 ~ Returning cached data.');
+      } else {
+        data = await parseMegogo(url);
+        await putVercelCache(`${VERCEL_BLOB_CACHE_PATH + saveFileName}`, data);
+      }
     }
 
     const { pageTitle, results } = data;

@@ -5,7 +5,8 @@ import {
   IS_VERCEL,
   VERCEL_BLOB_CACHE_PATH,
 } from './const';
-import { memoryCache } from './infrastructure/performance/lib';
+
+import { memoryCache } from './infrastructure/performance';
 import {
   generateCSV,
   generateExcel,
@@ -37,12 +38,12 @@ export async function POST(req: NextRequest) {
 
     let data: ParserMegogoData;
 
+    //caching by run-time
     data = await memoryCache.cached(saveFileName, CACHE_EXPIRATION_TIME, () =>
       parseMegogo(url),
     );
     console.log('🚀 ~ POST ~ memoryCache.cached:', data);
 
-    //loging
     const getCache = await memoryCache.get(saveFileName);
     console.log('🚀 ~ POST ~memoryCache.get:', getCache);
 

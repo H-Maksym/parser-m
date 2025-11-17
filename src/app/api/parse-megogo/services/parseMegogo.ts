@@ -6,6 +6,8 @@ import {
   SCREENSHOT_FILE_NAME,
   VERCEL_BLOB_CACHE_IMAGES_PATH,
 } from '../const';
+import { Results } from '../types';
+import { extractHtmlName } from '../utils';
 
 export async function parseMegogo(url: string) {
   console.log('🚀🚀🚀 Launching parseMegogo');
@@ -126,6 +128,7 @@ export async function parseMegogo(url: string) {
   await new Promise(resolve => setTimeout(resolve, 5000));
 
   await page.waitForSelector('ul.seasons-list');
+  console.log('🚀 ~ parseMegogo ~ page:', page);
 
   const seasons = await page.$$eval('ul.seasons-list li a', links =>
     links.map(a => ({
@@ -136,8 +139,9 @@ export async function parseMegogo(url: string) {
         : '',
     })),
   );
+  console.log('🚀 ~ parseMegogo ~ seasons:', seasons);
 
-  const results: Record<string, Array<{ title: string; url: string }>> = {};
+  const results: Results = {};
 
   for (const season of seasons) {
     await page.goto(season.href, { waitUntil: 'domcontentloaded' });
@@ -182,17 +186,23 @@ export async function parseMegogo(url: string) {
               '';
             const href = card.querySelector('a')?.getAttribute('href') ?? '';
             const url = href ? new URL(href, window.location.origin).href : '';
-            // const fileName = extractHtmlName(url);
+
             return {
               title,
               url,
-              // fileName,
             };
           })
           .filter(e => e.title && e.url),
     );
 
-    results[season.title] = episodes;
+    const processedEpisodes = episodes
+      .filter(ep => ep.title && ep.url)
+      .map(ep => ({
+        ...ep,
+        fileName: extractHtmlName(ep.url),
+      }));
+
+    results[season.title] = processedEpisodes;
   }
   console.log('✅ Close browser:');
 

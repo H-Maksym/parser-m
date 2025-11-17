@@ -15,7 +15,8 @@ export function generateCSV(data: ParserMegogoData): string {
     for (const ep of episodes) {
       const title = `"${ep.title.replace(/"/g, '""')}"`;
       const url = `"${ep.url.replace(/"/g, '""')}"`;
-      csvRows.push(`${title},${url}`);
+      const fileName = `"${ep.fileName.replace(/"/g, '""')}"`;
+      csvRows.push(`${title},${url},${fileName}`);
     }
     csvRows.push('');
   }

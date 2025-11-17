@@ -7,13 +7,13 @@ export function generateExcel(data: ParserMegogoData): Buffer {
   const sheetData: (string | null)[][] = [
     ['Title:', pageTitle],
     [],
-    ['Season', 'Episode Title', 'URL'],
+    ['Season', 'Episode Title', 'URL', 'Filename'],
   ];
 
   const seasons = Object.entries(results);
   seasons.forEach(([seasonTitle, episodes], index) => {
     for (const ep of episodes) {
-      sheetData.push([seasonTitle, ep.title, ep.url]);
+      sheetData.push([seasonTitle, ep.title, ep.url, ep.fileName]);
     }
 
     // ✅ We add an empty line if this is not the last season

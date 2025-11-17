@@ -1,7 +1,7 @@
 type CacheRecord<T> = { value: T; expires: number };
 
 export function createCache() {
-  const store = new Map<string, CacheRecord<any>>();
+  const store = new Map<string, CacheRecord<unknown>>();
 
   const get = <T>(key: string): T | null => {
     const entry = store.get(key);

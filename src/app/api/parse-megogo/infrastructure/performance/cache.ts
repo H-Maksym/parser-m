@@ -8,8 +8,11 @@ export function createCache() {
     if (!entry) return null;
     if (entry.expires < Date.now()) {
       store.delete(key);
+      console.log('🚀 ~ Runtime cached data is expired.');
       return null;
     }
+    console.log('🚀 ~ Returning cached data in runtime.');
+
     return entry.value as T;
   };
 
@@ -17,6 +20,8 @@ export function createCache() {
     store.set(key, { value, expires: Date.now() + ttlMs });
   };
 
+  const storeSize = () => store.size;
+  const allCache = () => JSON.stringify(Array.from(store.entries()));
   const del = (key: string) => store.delete(key);
 
   const cached = async <T>(
@@ -31,5 +36,5 @@ export function createCache() {
     return value;
   };
 
-  return { get, set, del, cached };
+  return { get, set, del, cached, storeSize, allCache };
 }

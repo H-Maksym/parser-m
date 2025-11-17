@@ -10,6 +10,7 @@ export const VERCEL_BLOB_CACHE_PATH =
   process.env.VERCEL_BLOB_CACHE_PATH || 'cache/parser-m/';
 export const VERCEL_BLOB_CACHE_IMAGES_PATH =
   process.env.VERCEL_BLOB_CACHE_IMAGES_PATH || 'cache/parser-m/images/';
+export const IS_VERCEL_CACHE = process.env.IS_VERCEL_CACHE;
 
 //environment for different deploy
 export const IS_AWS = process.env.IS_AWS;

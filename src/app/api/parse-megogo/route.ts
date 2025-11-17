@@ -2,7 +2,7 @@ import { BlobAccessError } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   CACHE_EXPIRATION_TIME,
-  IS_VERCEL,
+  IS_VERCEL_CACHE,
   VERCEL_BLOB_CACHE_PATH,
 } from './const';
 
@@ -36,7 +36,6 @@ export async function POST(req: NextRequest) {
 
     //Check cache from VercelBlob
     const saveFileName = sanitizeFileName(url).replace('.html', '.json');
-    console.log('🚀 ~ POST ~ saveFileName:', saveFileName);
 
     let data: ParserMegogoData;
 
@@ -45,12 +44,11 @@ export async function POST(req: NextRequest) {
       parseMegogo(url),
     );
 
-    if (IS_VERCEL) {
+    if (IS_VERCEL_CACHE) {
       const cacheResult = await getVercelCache(saveFileName, 100 * 60 * 1000);
-      console.log('🚀 ~ POST ~ cacheResult:', cacheResult);
       if (cacheResult) {
         data = cacheResult;
-        console.log('🚀 ~ Returning cached data.');
+        console.log('🚀 ~ Returning cached data from Vercel Blob.');
       } else {
         data = await parseMegogo(url);
         await putVercelCache(`${VERCEL_BLOB_CACHE_PATH + saveFileName}`, data);

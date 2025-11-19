@@ -79,24 +79,6 @@ export async function parseMegogo(url: string) {
   // });
   // console.log('🚀 ~ parseMegogo ~ stubs:', stubs);
 
-  // check the availability of the video in the region
-  const stubName: StubKey = 'geoUnavailable';
-  const isGeoUnavailable =
-    (await page.$(`["data-stub-name="${stubName}"]`)) !== null;
-
-  if (!isGeoUnavailable) {
-    const geoRegion = await page.evaluate(() =>
-      document.documentElement.getAttribute('data-geo')?.toUpperCase(),
-    );
-
-    console.log(`⚠️ The video is not available in your ${geoRegion} region.`);
-    throw new Error(
-      `The video ${url} is not available in  ${geoRegion} region.`,
-    );
-  } else {
-    console.log('✅ Video is available.');
-  }
-
   // Saves the PDF to pdfFileName.pdf.
   // await page.bringToFront();
   // await page.pdf({
@@ -165,6 +147,37 @@ export async function parseMegogo(url: string) {
     return h1 ? h1.textContent?.trim() : '';
   });
   console.log('🎬 Title:', pageTitle);
+
+  // check the availability of the video in the region
+  const stubName: StubKey = 'geoUnavailable';
+  const isGeoUnavailable =
+    (await page.$(`[data-stub-name=${stubName}]`)) !== null;
+
+  if (isGeoUnavailable) {
+    const geoRegion = await page.evaluate(() =>
+      document.documentElement.getAttribute('data-geo')?.toUpperCase(),
+    );
+
+    console.log(
+      `⚠️ The video by ${pageTitle} is not available in your ${geoRegion} region.`,
+    );
+
+    const data: ParserMegogoData = {
+      pageTitle: `Attention!!! - Video "- ${pageTitle} -" is not available in "- ${geoRegion} -" region.`,
+      results: {
+        [pageTitle]: [
+          {
+            title: pageTitle,
+            url,
+            fileName: extractHtmlName(url),
+          },
+        ],
+      },
+    };
+    await browser.close();
+    return data;
+  }
+  console.log('✅ Video is available.');
 
   // почекати вручну, якщо треба
   // await new Promise(resolve => setTimeout(resolve, 5000));

@@ -9,7 +9,7 @@
     "lint": "eslint",
     "install-chrome": "puppeteer browsers install chrome",
     "parse:megogo": "tsx scripts/parse-megogo.ts",
-    "postinstall": "npx puppeteer install --path ./.cache/puppeteer"
+    "postinstall": "pnpm dlx puppeteer browsers install chrome"
   },
   "dependencies": {
     "@sparticuz/chromium": "141.0.0",

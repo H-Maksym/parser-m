@@ -28,7 +28,7 @@ export async function launchBrowser() {
       // URL_CHROMIUM_PACK
       acceptInsecureCerts: true,
       executablePath: IS_VERCEL
-        ? await chromium.executablePath('/opt/bin/chromium')
+        ? await chromium.executablePath()
         : await chromium.executablePath(),
       defaultViewport: { width: 1366, height: 768 },
     };

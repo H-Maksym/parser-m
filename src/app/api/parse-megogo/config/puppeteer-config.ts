@@ -1,6 +1,6 @@
 import chromium from '@sparticuz/chromium';
 import type { LaunchOptions, Page } from 'puppeteer-core';
-import { IS_REMOTE, PROXY } from '../const';
+import { IS_REMOTE, PROXY, URL_CHROMIUM_PACK } from '../const';
 import { IS_VERCEL } from '../const/env';
 // Type for Page
 export type PuppeteerPage = Page;
@@ -28,7 +28,7 @@ export async function launchBrowser() {
       acceptInsecureCerts: true,
       executablePath: IS_VERCEL
         ? // ? await chromium.executablePath(URL_CHROMIUM_PACK)
-          await chromium.executablePath()
+          await chromium.executablePath(URL_CHROMIUM_PACK)
         : await chromium.executablePath(),
       defaultViewport: { width: 1366, height: 768 },
     };

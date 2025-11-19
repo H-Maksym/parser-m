@@ -97,7 +97,7 @@ export async function launchBrowser() {
   });
 
   await page.evaluateOnNewDocument(() => {
-    // @ts-ignore
+    // @ts-expect-error mock chrome.runtime for tests
     window.googletag = {
       cmd: [],
       pubads: () => ({

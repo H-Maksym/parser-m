@@ -15,6 +15,20 @@ export async function parseMegogo(url: string) {
   // Блокуємо аналітику, рекламу, трекери
   if (!IS_REMOTE) {
     await page.setRequestInterception(true);
+
+    page.on('request', req => {
+      if (req.url().includes('/geo')) {
+        return req.respond({
+          contentType: 'application/json',
+          body: JSON.stringify({ country: 'ua' }),
+        });
+      }
+      req.continue();
+    });
+
+    const resPage = page.on('request', req => console.log(req.url()));
+    console.log('🚀 ~ parseMegogo ~ resPage:', resPage);
+
     page.on('request', req => {
       const url = req.url();
       const blockedResources = [

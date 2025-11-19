@@ -5,6 +5,7 @@
     "bluekai",
     "domcontentloaded",
     "doubleclick",
+    "googletag",
     "googletagmanager",
     "googletagservices",
     "gstatic",
@@ -17,6 +18,7 @@
     "officedocument",
     "openxmlformats",
     "prebid",
+    "pubads",
     "requestfailed",
     "sparticuz",
     "spreadsheetml"

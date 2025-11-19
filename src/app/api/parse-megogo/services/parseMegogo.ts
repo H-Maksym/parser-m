@@ -26,9 +26,6 @@ export async function parseMegogo(url: string) {
       req.continue();
     });
 
-    const resPage = page.on('request', req => console.log(req.url()));
-    console.log('🚀 ~ parseMegogo ~ resPage:', resPage);
-
     page.on('request', req => {
       const url = req.url();
       const blockedResources = [

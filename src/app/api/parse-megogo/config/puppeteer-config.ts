@@ -69,19 +69,19 @@ export async function launchBrowser() {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
   });
 
-  // await page.evaluateOnNewDocument(() => {
-  //   // @ts-expect-error mock chrome.runtime for tests
-  //   window.googletag = {
-  //     cmd: [],
-  //     pubads: () => ({
-  //       enableSingleRequest() {},
-  //       collapseEmptyDivs() {},
-  //       setCentering() {},
-  //       addEventListener() {},
-  //     }),
-  //     enableServices() {},
-  //   };
-  // });
+  await page.evaluateOnNewDocument(() => {
+    // @ts-expect-error mock chrome.runtime for tests
+    window.googletag = {
+      cmd: [],
+      pubads: () => ({
+        enableSingleRequest() {},
+        collapseEmptyDivs() {},
+        setCentering() {},
+        addEventListener() {},
+      }),
+      enableServices() {},
+    };
+  });
 
   // await page.evaluateOnNewDocument(() => {
   //   const realGeo = 'ua';

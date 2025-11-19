@@ -2,7 +2,6 @@ import { put } from '@vercel/blob';
 import { launchBrowser } from '../config';
 import {
   IS_REMOTE,
-  IS_VERCEL,
   SCREENSHOT_FILE_NAME,
   VERCEL_BLOB_CACHE_IMAGES_PATH,
 } from '../const';
@@ -86,10 +85,9 @@ export async function parseMegogo(url: string) {
   // await acceptAllButton.click();
 
   // 🖼️ Save screenshot to /tmp
-  const screenshotPath =
-    IS_REMOTE && !IS_VERCEL
-      ? `/tmp/${SCREENSHOT_FILE_NAME}`
-      : `public/${SCREENSHOT_FILE_NAME}`;
+  const screenshotPath = IS_REMOTE
+    ? `/tmp/${SCREENSHOT_FILE_NAME}`
+    : `public/${SCREENSHOT_FILE_NAME}`;
 
   await page.bringToFront();
   const buffer = await page.screenshot({

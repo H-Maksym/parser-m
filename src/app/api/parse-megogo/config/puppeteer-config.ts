@@ -1,6 +1,6 @@
 import chromium from '@sparticuz/chromium';
 import type { LaunchOptions, Page } from 'puppeteer-core';
-import { IS_REMOTE, PROXY, URL_CHROMIUM_PACK } from '../const';
+import { IS_REMOTE, PROXY } from '../const';
 import { IS_VERCEL } from '../const/env';
 // Type for Page
 export type PuppeteerPage = Page;
@@ -15,18 +15,20 @@ export async function launchBrowser() {
     options = {
       headless: true,
       protocolTimeout: 180_000,
-      protocol: 'cdp',
       args: [
         ...chromium.args,
         '--no-sandbox',
         '--disable-setuid-sandbox',
+        // ignoreHTTPSErrors: true,
         '--ignore-certificate-errors',
         '--disable-blink-features=AutomationControlled',
+        // `--proxy-server=${PROXY}`,
         // '--disable-dev-shm-usage', // важливо для Render
-        `--proxy-server=${PROXY}`,
       ],
+      // URL_CHROMIUM_PACK
+      acceptInsecureCerts: true,
       executablePath: IS_VERCEL
-        ? await chromium.executablePath(URL_CHROMIUM_PACK)
+        ? await chromium.executablePath('/opt/bin/chromium')
         : await chromium.executablePath(),
       defaultViewport: { width: 1366, height: 768 },
     };

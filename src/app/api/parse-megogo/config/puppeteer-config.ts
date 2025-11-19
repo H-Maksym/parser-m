@@ -28,7 +28,7 @@ export async function launchBrowser() {
       acceptInsecureCerts: true,
       executablePath: IS_VERCEL
         ? // ? await chromium.executablePath(URL_CHROMIUM_PACK)
-          await chromium.executablePath('/vercel/path0/.cache/puppeteer/chrome')
+          await chromium.executablePath()
         : await chromium.executablePath(),
       defaultViewport: { width: 1366, height: 768 },
     };

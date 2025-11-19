@@ -38,26 +38,17 @@ export async function parseMegogo(url: string) {
     });
   }
 
-  await page.setRequestInterception(true);
-  page.on('request', request => {
-    // можна фільтрувати за URL (наприклад, м3u8, mp4 тощо)
-    console.log('Запит:', request.url());
-    console.log(
-      '🚀 ~ parseMegogo ~ request.failure:',
-      request.failure()?.errorText,
-    );
-    console.log('🚀 ~ parseMegogo ~ request.response:', request.response());
-    console.log('🚀 ~ parseMegogo ~ request.headers:', request.headers());
-    request.continue();
-  });
+  // await page.setRequestInterception(true);
+  // page.on('request', request => {
+  //   // можна фільтрувати за URL (наприклад, м3u8, mp4 тощо)
+  //   request.continue();
+  // });
 
-  // Також можна перевірити, чи є відео-елемент
-  const videoElem = await page.$('video'); // або інший селектор
-  if (videoElem) {
-    console.log('На сторінці є відео-елемент, ймовірно контент доступний.');
-  } else {
-    console.log('Відео-елемент не знайдено.');
-  }
+  // Пробуємо знайти елемент, що відповідає за текст помилок
+  // Шукаємо всі стуби на сторінці
+  // const stubs = await page.$$eval('[data-stub-name]', nodes =>
+  //   nodes.map(n => n.getAttribute('data-stub-name')),
+  // );
 
   // Переходимо на сервіс, який показує IP
   // const api64 = await page.goto('https://api64.ipify.org?format=json');
@@ -73,6 +64,34 @@ export async function parseMegogo(url: string) {
     waitUntil: 'networkidle2',
     timeout: 60000,
   });
+
+  const stubs = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll('*')).flatMap(el =>
+      Array.from(el.attributes)
+        .filter(attr => attr.name.includes('stub'))
+        .map(attr => ({
+          tag: el.tagName.toLowerCase(),
+          attribute: attr.name,
+          value: attr.value,
+        })),
+    );
+  });
+  console.log('🚀 ~ parseMegogo ~ stubs:', stubs);
+
+  // let result = {
+  //   url,
+  //   available: stubs.length === 0,
+  //   reason: stubs[0] || null,
+  //   allStubs: stubs,
+  // };
+
+  // Також можна перевірити, чи є відео-елемент
+  const videoElem = await page.$('video'); // або інший селектор
+  if (videoElem) {
+    console.log('На сторінці є відео-елемент, ймовірно контент доступний.');
+  } else {
+    console.log('Відео-елемент не знайдено.');
+  }
 
   // Saves the PDF to pdfFileName.pdf.
   // await page.bringToFront();

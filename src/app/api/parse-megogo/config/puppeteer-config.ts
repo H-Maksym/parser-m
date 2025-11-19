@@ -73,14 +73,14 @@ export async function launchBrowser() {
     const origGetAttr = Element.prototype.getAttribute;
     Element.prototype.getAttribute = function (name) {
       if (name === 'data-geo') return realGeo;
-      return origGetAttr.apply(this, arguments);
+      return origGetAttr.call(this, name);
     };
 
     // Патчимо setAttribute — ігноруємо всі спроби змінити data-geo
     const origSetAttr = Element.prototype.setAttribute;
     Element.prototype.setAttribute = function (name, value) {
-      if (name === 'data-geo') return; // забороняємо перезапис
-      return origSetAttr.apply(this, arguments);
+      if (name === 'data-geo') return;
+      return origSetAttr.call(this, name, value);
     };
 
     // Фактично встановлюємо UA до запуску скриптів

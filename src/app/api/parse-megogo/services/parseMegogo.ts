@@ -141,6 +141,8 @@ export async function parseMegogo(url: string) {
       '.btn.consent-button.jsPopupConsent[data-element-code="continue"]',
     );
   }
+  const content = await page.content();
+  console.log('🚀 ~ parseMegogo ~ content:', content);
 
   const pageTitle = await page.evaluate(() => {
     const h1 = document.querySelector('h1.video-title[itemprop="name"]');
@@ -155,7 +157,10 @@ export async function parseMegogo(url: string) {
 
   if (isGeoUnavailable) {
     const geoRegion = await page.evaluate(() =>
-      document.documentElement.getAttribute('data-geo')?.toUpperCase(),
+      document
+        .querySelector('[data-geo]')
+        ?.getAttribute('data-geo')
+        ?.toUpperCase(),
     );
 
     console.log(

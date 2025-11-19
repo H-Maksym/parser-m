@@ -42,6 +42,12 @@ export async function parseMegogo(url: string) {
   page.on('request', request => {
     // можна фільтрувати за URL (наприклад, м3u8, mp4 тощо)
     console.log('Запит:', request.url());
+    console.log(
+      '🚀 ~ parseMegogo ~ request.failure:',
+      request.failure()?.errorText,
+    );
+    console.log('🚀 ~ parseMegogo ~ request.response:', request.response());
+    console.log('🚀 ~ parseMegogo ~ request.headers:', request.headers());
     request.continue();
   });
 

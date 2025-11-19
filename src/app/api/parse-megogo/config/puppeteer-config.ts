@@ -66,10 +66,8 @@ export async function launchBrowser() {
 
   // Вставляємо скрипт до завантаження будь-якої сторінки
   await page.evaluateOnNewDocument(() => {
-    // Підміна data-geo
-    Object.defineProperty(document.documentElement, 'dataset', {
-      get: () => ({ geo: 'ua' }),
-    });
+    // Встановлюємо атрибут на <html> до завантаження скриптів сайту
+    document.documentElement.setAttribute('data-geo', 'ua');
   });
 
   await page.setUserAgent({

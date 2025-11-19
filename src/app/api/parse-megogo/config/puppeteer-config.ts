@@ -69,46 +69,46 @@ export async function launchBrowser() {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
   });
 
-  await page.evaluateOnNewDocument(() => {
-    // @ts-expect-error mock chrome.runtime for tests
-    window.googletag = {
-      cmd: [],
-      pubads: () => ({
-        enableSingleRequest() {},
-        collapseEmptyDivs() {},
-        setCentering() {},
-        addEventListener() {},
-      }),
-      enableServices() {},
-    };
-  });
+  // await page.evaluateOnNewDocument(() => {
+  //   // @ts-expect-error mock chrome.runtime for tests
+  //   window.googletag = {
+  //     cmd: [],
+  //     pubads: () => ({
+  //       enableSingleRequest() {},
+  //       collapseEmptyDivs() {},
+  //       setCentering() {},
+  //       addEventListener() {},
+  //     }),
+  //     enableServices() {},
+  //   };
+  // });
 
-  await page.evaluateOnNewDocument(() => {
-    const realGeo = 'ua';
+  // await page.evaluateOnNewDocument(() => {
+  //   const realGeo = 'ua';
 
-    // Патчимо getAttribute
-    const origGetAttr = Element.prototype.getAttribute;
-    Element.prototype.getAttribute = function (name) {
-      if (name === 'data-geo') return realGeo;
-      return origGetAttr.call(this, name);
-    };
+  //   // Патчимо getAttribute
+  //   const origGetAttr = Element.prototype.getAttribute;
+  //   Element.prototype.getAttribute = function (name) {
+  //     if (name === 'data-geo') return realGeo;
+  //     return origGetAttr.call(this, name);
+  //   };
 
-    // Патчимо setAttribute
-    const origSetAttr = Element.prototype.setAttribute;
-    Element.prototype.setAttribute = function (name, value) {
-      if (name === 'data-geo') return; // блокуємо перезапис
-      return origSetAttr.call(this, name, value);
-    };
+  //   // Патчимо setAttribute
+  //   const origSetAttr = Element.prototype.setAttribute;
+  //   Element.prototype.setAttribute = function (name, value) {
+  //     if (name === 'data-geo') return; // блокуємо перезапис
+  //     return origSetAttr.call(this, name, value);
+  //   };
 
-    // Чекаємо появи <html>
-    const interval = setInterval(() => {
-      const html = document.documentElement;
-      if (html) {
-        html.setAttribute('data-geo', realGeo);
-        clearInterval(interval);
-      }
-    }, 1);
-  });
+  //   // Чекаємо появи <html>
+  //   const interval = setInterval(() => {
+  //     const html = document.documentElement;
+  //     if (html) {
+  //       html.setAttribute('data-geo', realGeo);
+  //       clearInterval(interval);
+  //     }
+  //   }, 1);
+  // });
 
   await page.evaluateOnNewDocument(() => {
     Object.defineProperty(navigator, 'webdriver', { get: () => false });

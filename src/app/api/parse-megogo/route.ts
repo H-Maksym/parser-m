@@ -58,11 +58,17 @@ export async function POST(req: NextRequest) {
     const { pageTitle, results } = data;
 
     if (format === 'csv') {
-      const csv = generateCSV(data);
+      const csvContent = generateCSV(data);
+      // const BOMBuffer = Buffer.from([0xef, 0xbb, 0xbf]);
+      // const csvBuffer = Buffer.concat([
+      //   BOMBuffer,
+      //   Buffer.from(csvContent, 'utf8'),
+      // ]);
+
       const safeFileName = sanitizeFileName(pageTitle || 'episodes');
       const encodedFileName = encodeURIComponent(safeFileName); //для кирилиці
 
-      return new NextResponse(csv, {
+      return new NextResponse(csvContent, {
         status: 200,
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',

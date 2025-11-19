@@ -2,6 +2,7 @@
 
 import { Loader } from '@/_components/Loader';
 import { FC, useState } from 'react';
+import { getFilenameFromDisposition } from './getFilenameFromDisposition ';
 
 interface IParsePage {
   className?: string;
@@ -13,7 +14,7 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // 🔍 Парсинг і вивід JSON у інтерфейс
+  // 🔍Parsing and outputting JSON to the interface
   const handleParse = async () => {
     if (!inputUrl) return;
 
@@ -43,7 +44,7 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
     }
   };
 
-  // 💾 Скачування CSV
+  // 💾 CSV download
   const handleDownloadCSV = async () => {
     if (!inputUrl) return;
 
@@ -67,7 +68,12 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'episodes.csv';
+      // 1️⃣ get the title
+      const disposition = res.headers.get('Content-Disposition');
+      // 2️⃣ extract the file name
+      let filename = getFilenameFromDisposition(disposition);
+
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -81,44 +87,7 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
     }
   };
 
-  // 💾 Скачування Excel
-  // const handleDownloadExcel = async () => {
-  //   if (!inputUrl) return;
-
-  //   setLoading(true);
-
-  //   try {
-  //     const res = await fetch('/api/parse-megogo?format=excel', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ url: inputUrl }),
-  //     });
-
-  //     if (!res.ok) {
-  //       const errorData = await res.json();
-  //       setResult({
-  //         error: errorData.error || 'Помилка при завантаженні Excel',
-  //       });
-  //       return;
-  //     }
-
-  //     const blob = await res.blob();
-  //     const url = window.URL.createObjectURL(blob);
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.download = 'episodes.xlsx';
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     link.remove();
-  //     window.URL.revokeObjectURL(url);
-
-  //     // setResult({ success: 'Excel файл успішно завантажено' });
-  //   } catch (err) {
-  //     setResult({ error: 'Помилка при скачуванні Excel', err });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // 💾 Download Excel
   const handleDownloadExcel = async () => {
     if (!inputUrl) return;
     setLoading(true);
@@ -142,22 +111,11 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
 
       const blob = await res.blob();
 
-      // ✅ Отримати ім'я файлу з Content-Disposition
-      let filename = 'episodes.xlsx';
+      // ✅Get the filename from Content-Disposition
+      // 1️⃣ get the title
       const disposition = res.headers.get('Content-Disposition');
-
-      if (disposition) {
-        const filenameStarMatch = disposition.match(
-          /filename\*=UTF-8''([^;\n]*)/,
-        );
-        const filenameMatch = disposition.match(/filename="([^"]+)"/);
-
-        if (filenameStarMatch && filenameStarMatch[1]) {
-          filename = decodeURIComponent(filenameStarMatch[1]);
-        } else if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1];
-        }
-      }
+      // 2️⃣ extract the file name
+      let filename = getFilenameFromDisposition(disposition);
 
       // ⬇️ Створити посилання для завантаження
       const url = window.URL.createObjectURL(blob);
@@ -175,7 +133,7 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
     }
   };
 
-  // 📋 Копіювання JSON у буфер
+  // 📋 Copy JSON to buffer
   const handleCopy = () => {
     if (!result) return;
 

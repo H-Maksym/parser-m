@@ -6,7 +6,7 @@ import {
   VERCEL_BLOB_CACHE_IMAGES_PATH,
 } from '../const';
 import { ParserMegogoData, Results } from '../types';
-import { extractHtmlName } from '../utils';
+import { extractHtmlName, StubKey } from '../utils';
 
 export async function parseMegogo(url: string) {
   console.log('🚀🚀🚀 Launching parseMegogo');
@@ -65,32 +65,36 @@ export async function parseMegogo(url: string) {
     timeout: 60000,
   });
 
-  const stubs = await page.evaluate(() => {
-    return Array.from(document.querySelectorAll('*')).flatMap(el =>
-      Array.from(el.attributes)
-        .filter(attr => attr.name.includes('stub'))
-        .map(attr => ({
-          tag: el.tagName.toLowerCase(),
-          attribute: attr.name,
-          value: attr.value,
-        })),
+  //get all stubs
+  // const stubs = await page.evaluate(() => {
+  //   return Array.from(document.querySelectorAll('*')).flatMap(el =>
+  //     Array.from(el.attributes)
+  //       .filter(attr => attr.name.includes('stub'))
+  //       .map(attr => ({
+  //         tag: el.tagName.toLowerCase(),
+  //         attribute: attr.name,
+  //         value: attr.value,
+  //       })),
+  //   );
+  // });
+  // console.log('🚀 ~ parseMegogo ~ stubs:', stubs);
+
+  // check the availability of the video in the region
+  const stubName: StubKey = 'geoUnavailable';
+  const isGeoUnavailable =
+    (await page.$(`["data-stub-name="${stubName}"]`)) !== null;
+
+  if (!isGeoUnavailable) {
+    const geoRegion = await page.evaluate(() =>
+      document.documentElement.getAttribute('data-geo')?.toUpperCase(),
     );
-  });
-  console.log('🚀 ~ parseMegogo ~ stubs:', stubs);
 
-  // let result = {
-  //   url,
-  //   available: stubs.length === 0,
-  //   reason: stubs[0] || null,
-  //   allStubs: stubs,
-  // };
-
-  // Також можна перевірити, чи є відео-елемент
-  const videoElem = await page.$('video'); // або інший селектор
-  if (videoElem) {
-    console.log('На сторінці є відео-елемент, ймовірно контент доступний.');
+    console.log(`⚠️ The video is not available in your ${geoRegion} region.`);
+    throw new Error(
+      `The video ${url} is not available in  ${geoRegion} region.`,
+    );
   } else {
-    console.log('Відео-елемент не знайдено.');
+    console.log('✅ Video is available.');
   }
 
   // Saves the PDF to pdfFileName.pdf.

@@ -66,25 +66,30 @@ export async function launchBrowser() {
 
   // Вставляємо скрипт до завантаження будь-якої сторінки
   await page.evaluateOnNewDocument(() => {
-    // Фіксуємо значення один раз
     const realGeo = 'ua';
 
-    // Патчимо getAttribute так, щоб ВСІ елементи повертали ua
+    // Патчимо getAttribute
     const origGetAttr = Element.prototype.getAttribute;
     Element.prototype.getAttribute = function (name) {
       if (name === 'data-geo') return realGeo;
       return origGetAttr.call(this, name);
     };
 
-    // Патчимо setAttribute — ігноруємо всі спроби змінити data-geo
+    // Патчимо setAttribute
     const origSetAttr = Element.prototype.setAttribute;
     Element.prototype.setAttribute = function (name, value) {
-      if (name === 'data-geo') return;
+      if (name === 'data-geo') return; // блокуємо перезапис
       return origSetAttr.call(this, name, value);
     };
 
-    // Фактично встановлюємо UA до запуску скриптів
-    document.documentElement.setAttribute('data-geo', realGeo);
+    // Чекаємо появи <html>
+    const interval = setInterval(() => {
+      const html = document.documentElement;
+      if (html) {
+        html.setAttribute('data-geo', realGeo);
+        clearInterval(interval);
+      }
+    }, 1);
   });
 
   await page.setUserAgent({

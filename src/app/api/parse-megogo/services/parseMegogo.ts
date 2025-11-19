@@ -38,6 +38,21 @@ export async function parseMegogo(url: string) {
     });
   }
 
+  await page.setRequestInterception(true);
+  page.on('request', request => {
+    // можна фільтрувати за URL (наприклад, м3u8, mp4 тощо)
+    console.log('Запит:', request.url());
+    request.continue();
+  });
+
+  // Також можна перевірити, чи є відео-елемент
+  const videoElem = await page.$('video'); // або інший селектор
+  if (videoElem) {
+    console.log('На сторінці є відео-елемент, ймовірно контент доступний.');
+  } else {
+    console.log('Відео-елемент не знайдено.');
+  }
+
   // Переходимо на сервіс, який показує IP
   // const api64 = await page.goto('https://api64.ipify.org?format=json');
   // console.log('🚀 ~ parseMegogo ~ api64:', api64);

@@ -71,7 +71,7 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
       // 1️⃣ get the title
       const disposition = res.headers.get('Content-Disposition');
       // 2️⃣ extract the file name
-      let filename = getFilenameFromDisposition(disposition);
+      const filename = getFilenameFromDisposition(disposition);
 
       link.download = filename;
       document.body.appendChild(link);
@@ -115,7 +115,7 @@ export const ParsePage: FC<IParsePage> = ({ className }) => {
       // 1️⃣ get the title
       const disposition = res.headers.get('Content-Disposition');
       // 2️⃣ extract the file name
-      let filename = getFilenameFromDisposition(disposition);
+      const filename = getFilenameFromDisposition(disposition);
 
       // ⬇️ Створити посилання для завантаження
       const url = window.URL.createObjectURL(blob);

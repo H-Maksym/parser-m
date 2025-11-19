@@ -76,18 +76,20 @@ export async function launchBrowser() {
     Object.defineProperty(navigator, 'languages', {
       get: () => ['uk-UA', 'uk'],
     });
-    Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
-    // Підміна data-geo для будь-якого елемента
-    document.addEventListener('DOMContentLoaded', () => {
-      const elements = document.querySelectorAll('[data-geo]');
-      elements.forEach(el => el.setAttribute('data-geo', 'ua'));
-    });
+    // Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4] });
+    // // Підміна data-geo для будь-якого елемента
+    // document.addEventListener('DOMContentLoaded', () => {
+    //   const elements = document.querySelectorAll('[data-geo]');
+    //   elements.forEach(el => el.setAttribute('data-geo', 'ua'));
+    // });
     console.log('🚀 ~ launchBrowser ~ evaluateOnNewDocument:');
   });
 
   await page.setExtraHTTPHeaders({
     'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
   });
+
+  await page.emulateTimezone('Europe/Kiev');
 
   // // Встановлення геолокації для сторінки (Київ)
   // const context = browser.defaultBrowserContext();
